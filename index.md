@@ -17,6 +17,6 @@ This course offers the necessary background for students who would like to pursu
 * **Office Hours**: Check the time below.
 * **Announcement or Discussion**: Piazza (TBD)
 * **Submitting your work**: Gradescope (TBD)
-* **Contact**: Please make a private post in Piazza (TBD)
+* **Contact**: Please make a private post in Piazza
 
 ----

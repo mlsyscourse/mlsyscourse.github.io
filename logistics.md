@@ -43,9 +43,11 @@ Grades will be based on the following parts:
 
 You will submit all your work to Gradescope.
 
+<!--
 ### Submission in GradeScope
 
 TBD.
+-->
 
 <!-- For the course project or presentation, you may work in groups of up to two or three students total. Only one person should submit the writeup and code on Gradescope. Make sure you **mark your partner as a collaborator on Gradescope** and that both names are listed in the writeup.
 
@@ -55,9 +57,11 @@ TBD.
 
 **Paper presentation submission**: Students are required to submit slides in **PDF**. -->
 
+<!--
 ***
 
 ## Course Project
+-->
 
 <!-- The course project will be completed by group of two to three students. We have potential candidate project ideas in the area of machine learning and system [(link)](https://docs.google.com/document/d/1t_lNGniPy6-NR3Jyi5tmk0NF5jA1OIuLtyiL9KBg17Y/edit?usp=sharing). Still, you are also more than welcome to bring your own ideas that are related to your research. The Course project will have the following three components:
 
@@ -113,11 +117,13 @@ For your final project report, the team is expected to write a final report (up 
 
 You are required to submit your codes and final report in the [MLSys 2021 format](https://media.mlsys.org/Conferences/MLSYS2021/Styles/mlsys2021style.zip) (PDF) to the Gradescope. Again, please make sure you mark your partner as a collaborator on Gradescope and that all names are listed in the final report. -->
 
+<!--
 ***
 
 ## Late Policy
 
 TBD.
+-->
 
 <!-- Each student has a total of **7 grace days** that may be applied to the assignments EXCEPT FOR the final course project report and presentation in order to make sure grading is done by the school-wide deadline. **No more than 3 grace days may be used on any single assignment**.
 
@@ -125,19 +131,21 @@ Any assignment submitted more than 3 days past the deadline (or the date the stu
 
 Grace days will be **subtracted from all students in the team**. E.g. an assignment submitted 1 day late by a team of 2 people will result in both team members losing 1 grace day from their total allotment. -->
 
+<!--
 ***
 
 ## Regrade Policy
 
 TBD.
+-->
 
 <!-- If you feel that we have made a mistake in grading your report, please request a regrade on Gradescope and we will consider your request.
 
 Please note that regrading may cause your grade to go either up or down. -->
 
+<!-- 
 ***
 
-<!-- 
 ## AWS Resources
 
 For those of you who need GPU resources for future homeworks, please read through this section carefully.
@@ -150,9 +158,11 @@ For those of you who need GPU resources for future homeworks, please read throug
 ***
  -->
 
+<!--
 ## Collaboration Policy
 
 TBD.
+-->
 
 <!-- (Adapted from Pat Virtue's [10-601 Fall 2020](https://www.cs.cmu.edu/~10601-f20/#policies) Course Policies.)
 
@@ -167,11 +177,13 @@ We encourage you to discuss course content and assignments with your classmates.
 Violations of these policies will be reported as an academic integrity violation. Information about academic integrity at CMU may be found at [this link](https://www.cmu.edu/academic-integrity). Please contact the instructor if you ever have any questions regarding academic integrity or these collaboration policies. -->
 
 
+<!--
 ***
 
 ## Academic Integrity (Read this carefully!)
 
 TBD.
+-->
 
 <!-- ### Previously Used Assignments
 
@@ -195,11 +207,13 @@ Students are responsible for pro-actively protecting their work from copying and
 
 To protect future students, do not post your solutions publicly, neither during the course nor afterwards. -->
 
+<!--
 ***
 
 ## Penalties for Violations of Course Policies
 
 TBD.
+-->
 
 <!-- All violations (even the first violation) of the academic integrity or collaboration policy will always be reported to the university authorities (your Department Head, Associate Dean, Dean of Student Affairs, etc.) as an official Academic Integrity Violation and will carry severe penalties.
 
@@ -207,11 +221,13 @@ TBD.
 
 2. The penalty for the second violation is failure in the course, and can even lead to dismissal from the university. -->
 
+<!--
 ***
 
 ## Extensions
 
 TBD.
+-->
 
 <!-- In general, we do not grant extensions on assignments. There are several exceptions:
 
@@ -223,41 +239,49 @@ TBD.
 
 For any of the above situations, you may request an extension by posting a private post in Piazza. Posting should be done as soon as you are aware of the conflict and **at least 5 days prior to the deadline**. In the case of an emergency, no notice is needed. -->
 
+<!--
 ***
 
 ## Pass/Fail Policy
 
 TBD.
+-->
 
 <!-- We allow you take the course as Pass/Fail. Instructor permission is not required. You must complete all aspects of the course (all homeworks) if you take the course as Pass/Fail.
 
 What grade is the cutoff for Pass will depend on your program. Be sure to check with your program / department as to whether you can count a Pass/Fail course towards your degree requirements, **notify us that you want to take the course Pass/Fail, and notify us of the Pass threshold your department uses** (i.e., does it correspond to a grade of A, B, C, or D?) -->
 
+<!--
 ***
 
 ## Auditing
 
 TBD.
+-->
 
 <!-- - Official auditing of the course (i.e. taking the course for an  _Audit_ grade) is not permitted this semester.
 
 - Unofficial auditing of the course (i.e. watching the lectures online or attending them in person, but not turning in homeworks to grade) is welcome and permitted without prior approval. We give priority to students who are officially registered for the course, so informal auditors may only take a seat in the classroom **if there is one available 10 minutes after the start of class**. Unofficial auditors will not be given access to course materials such as homework assignments and exams. -->
 
+<!--
 ***
 
 ## Students with Course Conflicts
 
 TBD.
+-->
 
 <!-- Students with timing conflicts (i.e., who have another class offered at the same time)  will be permitted to take this course.
 
 **However, there may be occasional days when we need you to arrive in person during class time (e.g. for student presentations)**.  We will let you know of any dates we require you to be available, as soon as we know them. -->
 
+<!--
 ***
 
 ## Accommodations for Students with Disabilities
 
 TBD.
+-->
 
 <!-- If you have a disability and have an accommodations letter from the Disability Resources office, please discuss your accommodation needs with [Ganesh](mailto:giyer@andrew.cmu.edu) or one of the instructors as early in the semester as possible. We will work with you to ensure that accommodations are provided as appropriate.
 
@@ -271,11 +295,13 @@ Do your best to maintain a healthy lifestyle this semester by eating well, exerc
 
 If you or anyone you know experiences any academic stress, difficult life events, or feelings like anxiety or depression, we strongly encourage you to seek support. Counseling and Psychological Services (CaPS) is here to help: call 412-268-2922 and visit their website at [www.cmu.edu/counseling](http://www.cmu.edu/counseling/). Consider reaching out to a friend, faculty or family member you trust for help getting connected to the support that can help.
 
+<!--
 ***
 
 ## Listeners outside CMU
 
 TBD.
+-->
 
 <!-- Please feel free to reuse any of these course materials that you find of use in your own courses.
 
