@@ -1,0 +1,251 @@
+- date: 01/17 Wed
+  lecturer: Both
+  title: >
+    Week 1: <strong>Why ML Systems?</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 01/22 Mon
+  lecturer: Chen
+  title: >
+    Week 2: <strong>Introduction to deep learning and programming abstraction</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 01/24 Wed
+  lecturer: Jia
+  title: >
+    Week 2: <strong>Introduction to Machine Learning Systems</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 01/29 Mon
+  lecturer: Chen
+  title: >
+    Week 3: <strong>Automatic Differentiation</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 01/31 Wed
+  lecturer: Chen
+  title: >
+    Week 3: <strong>Optimizing Linear Algebra</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 02/05 Mon
+  lecturer: Jia
+  title: >
+    Week 4: <strong>GPU Architecture and CUDA Programming (1)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 02/07 Wed
+  lecturer: Jia
+  title: >
+    Week 4: <strong>GPU Architecture and CUDA Programming (2)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 02/12 Mon
+  lecturer: Chen
+  title: >
+    Week 5: <strong>ML Compilation (1)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 02/14 Wed
+  lecturer: Chen
+  title: >
+    Week 5: <strong>ML Compilation (2)</strong>
+  notes:
+  slides:
+  readings:
+  logistics:
+
+- date: 02/19 Mon
+  lecturer: Chen
+  title: >
+    Week 6: <strong>Graph-level Optimization</strong>
+  notes:
+  readings:
+  logistics:
+
+- date: 02/21 Tue
+  lecturer: Chen
+  title: >
+    Week 6: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 02/26 Mon
+  lecturer: Jia
+  title: >
+    Week 7: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+
+- date: 02/28 Tue
+  lecturer: Jia
+  title: >
+    Week 7: <strong>ML Parallelization (model and pipeline parallelism)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+
+- date: 03/04 Mon
+  lecturer:
+  title: >
+    Week 8: <strong>Spring Break. No Class.</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 03/06 Wed
+  lecturer:
+  title: >
+    Week 8: <strong>Spring Break. No Class.</strong>
+  slides:
+  readings:
+  logistics:
+
+- date: 03/11 Mon
+  lecturer: Jia
+  title: >
+    Week 9: <strong>LLMs: Transformers + Attention</strong>
+  slides:
+  readings:
+  logistics:
+
+- date: 03/13 Wed
+  lecturer: Jia
+  title: >
+    Week 9: <strong>LLMs: Attention Optimizations (flash / paged)</strong>
+  slides:
+  notes:
+  readings:
+
+
+- date: 03/18 Mon
+  lecturer: Jia
+  title: >
+    Week 10: <strong>LLMs: Serving (speculative decoding, continuous batching)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 03/20 Wed
+  lecturer: Chen
+  title: >
+    Week 10: <strong>LLMs: Training (PEFT)</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+
+- date: 03/25 Mon
+  lecturer: Both
+  title: >
+    Week 11: <i>Meetings to discuss project ideas</i>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+
+- date: 03/27 Wed
+  lecturer: Zhihao Zhang
+  title: >
+    Week 11: <strong>LLMs: retrieval-augmented generation</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+
+- date: 04/01 Mon
+  lecturer: Chen
+  title: >
+    Week 12: <strong>LLMs: Mixture of Experts</strong>
+  slides:
+  notes:
+  readings:
+
+
+
+- date: 04/03 Wed
+  lecturer: Jia
+  title: >
+    Week 12: <strong>Advanced topics: Automated ML Parallelization</strong>
+  notes:
+  readings:
+  logistics:
+
+
+- date: 04/08 Mon
+  lecturer: Chen
+  title: >
+    Week 13: <strong>Advanced topics</strong>
+  notes:
+  readings:
+  logistics:
+
+- date: 04/10 Wed
+  lecturer:
+  title: >
+    Week 13: <strong>Guest Lecture</strong>
+  logistics:
+
+- date: 04/15 Mon
+  lecturer:
+  title: >
+    Week 14: <strong>Guest Lecture</strong>
+  slides:
+  notes:
+
+- date: 04/17 Wed
+  lecturer:
+  title: >
+    Week 14: <strong></strong>
+  logistics:
+  readings:
+
+- date: 04/22 Mon
+  lecturer:
+  title: >
+    Week 15: <strong></strong>
+  logistics:
+
+
+- date: 04/24 Wed
+  lecturer:
+  title: >
+    Week 15: <strong>Final Presentations</strong>
+  logistics:
+  readings:

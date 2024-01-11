@@ -1,0 +1,31 @@
+Instructors:
+    - name: Tianqi Chen
+      email: tqchen@cmu.edu
+      url: https://tqchen.com/
+      office-hours: TBD
+      image: staff/tqchen.jpg
+
+    - name: Zhihao Jia
+      email: zhihao@cmu.edu
+      url: https://catalyst.cs.cmu.edu/15-884-mlsys-sp21/
+      office-hours: TBD
+      image: staff/jiazhihao.jpg
+
+TAs:
+    - name: Hongyi Jin
+      email: hongyij@cs.cmu.edu
+      url: https://www.linkedin.com/in/hongyi-jin-97b943250/
+      office-hours: TBD
+      image: staff/hongyij.jpg
+
+    - name: Ruihang Lai
+      email: ruihangl@cs.cmu.edu
+      url: https://ruihanglai.com
+      office-hours: TBD
+      image: staff/ruihangl.jpg
+
+    - name: Zhihao Zhang
+      email: zhihaoz3@cs.cmu.edu
+      url: https://jackfram.github.io
+      office-hours: TBD
+      image: staff/zhihaozhang.jpg
