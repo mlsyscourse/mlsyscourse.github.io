@@ -136,7 +136,7 @@
 - date: 03/11 Mon
   lecturer: Jia
   title: >
-    Week 9: <strong>LLMs: Transformers + Attention</strong>
+    Week 9: <strong>LLMs: Introduction to Transformers + Attention</strong>
   slides:
   readings:
   logistics:
@@ -144,7 +144,7 @@
 - date: 03/13 Wed
   lecturer: Jia
   title: >
-    Week 9: <strong>LLMs: Attention Optimizations (flash / paged)</strong>
+    Week 9: <strong>LLMs: Attention Optimizations (Flash/Paged Attention)</strong>
   slides:
   notes:
   readings:
@@ -153,7 +153,7 @@
 - date: 03/18 Mon
   lecturer: Jia
   title: >
-    Week 10: <strong>LLMs: Serving (speculative decoding, continuous batching)</strong>
+    Week 10: <strong>LLMs Serving: Continuous Batching, Speculative Decoding </strong>
   slides:
   notes:
   readings:
@@ -162,7 +162,7 @@
 - date: 03/20 Wed
   lecturer: Chen
   title: >
-    Week 10: <strong>LLMs: Training (PEFT)</strong>
+    Week 10: <strong>LLMs Training: Parameter-Efficient Fine-tuning (LoRA) </strong>
   slides:
   notes:
   readings:
@@ -182,7 +182,7 @@
 - date: 03/27 Wed
   lecturer: Zhihao Zhang
   title: >
-    Week 11: <strong>LLMs: retrieval-augmented generation</strong>
+    Week 11: <strong>LLMs: Retrieval-Augmented Generation</strong>
   slides:
   notes:
   readings:
