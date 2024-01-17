@@ -32,7 +32,7 @@
   slides:
   notes:
   readings:
-  logistics:
+  logistics: Lab 1 Release (Tentative)
 
 - date: 01/31 Wed
   lecturer: Chen
@@ -68,7 +68,7 @@
   slides:
   notes:
   readings:
-  logistics:
+  logistics: Lab 1 Due (Tentative)
 
 - date: 02/14 Wed
   lecturer: Chen
@@ -77,7 +77,7 @@
   notes:
   slides:
   readings:
-  logistics:
+  logistics: Lab 2 Release (Tentative)
 
 - date: 02/19 Mon
   lecturer: Chen
@@ -87,7 +87,7 @@
   readings:
   logistics:
 
-- date: 02/21 Tue
+- date: 02/21 Wed
   lecturer: Chen
   title: >
     Week 6: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
@@ -106,14 +106,14 @@
   logistics:
 
 
-- date: 02/28 Tue
+- date: 02/28 Wed
   lecturer: Jia
   title: >
     Week 7: <strong>ML Parallelization (model and pipeline parallelism)</strong>
   slides:
   notes:
   readings:
-  logistics:
+  logistics: Lab 2 Due, Lab 3 Release (Tentative)
 
 
 - date: 03/04 Mon
@@ -166,7 +166,7 @@
   slides:
   notes:
   readings:
-  logistics:
+  logistics: Lab 3 Due (Tentative)
 
 
 - date: 03/25 Mon
@@ -186,7 +186,7 @@
   slides:
   notes:
   readings:
-  logistics:
+  logistics: Project Proposal Due (Tentative)
 
 
 - date: 04/01 Mon
@@ -248,4 +248,4 @@
   title: >
     Week 15: <strong>Final Presentations</strong>
   logistics:
-  readings:
+  readings: Project Recording and Poster Due
