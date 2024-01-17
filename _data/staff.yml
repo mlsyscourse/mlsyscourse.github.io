@@ -7,7 +7,7 @@ Instructors:
 
     - name: Zhihao Jia
       email: zhihao@cmu.edu
-      url: https://catalyst.cs.cmu.edu/15-884-mlsys-sp21/
+      url: https://www.cs.cmu.edu/~zhihaoj2/
       office-hours: upon request
       image: staff/jiazhihao.jpg
 
@@ -23,6 +23,12 @@ TAs:
       url: https://ruihanglai.com
       office-hours: TBD
       image: staff/ruihangl.jpg
+
+    - name: Gabriele Oliaro
+      email: goliaro@cs.cmu.edu
+      url: https://www.gabrieleoliaro.com
+      office-hours: TBD
+      image: staff/gabriele.jpg
 
     - name: Zhihao Zhang
       email: zhihaoz3@cs.cmu.edu
