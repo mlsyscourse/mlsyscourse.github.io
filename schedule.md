@@ -56,12 +56,8 @@ description: ""
         ]
     </td>
     <td>
-        {% if lecture.readings %}
-        <ul>
-        {% for reading in lecture.readings %}
-            <li>{{ reading }}</li>
-        {% endfor %}
-        </ul>
+        {% if lecture.lecturer %}
+        {{ lecture.lecturer }}
         {% endif %}
     </td>
     <td>
