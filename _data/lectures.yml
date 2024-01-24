@@ -19,16 +19,16 @@
 - date: 01/24 Wed
   lecturer: Chen
   title: >
-    Week 2: <strong>Automatic Differentiation</strong>
-  slides:
+    Week 2: <strong>Introduction to Machine Learning Systems</strong>
+  slides: /slides/03-introduction-to-MLSys.pdf
   notes:
   readings:
   logistics:
 
 - date: 01/29 Mon
-  lecturer: Jia
+  lecturer: Chen
   title: >
-    Week 3: <strong>Introduction to Machine Learning Systems</strong>
+    Week 3: <strong>Automatic Differentiation</strong>
   slides:
   notes:
   readings:
