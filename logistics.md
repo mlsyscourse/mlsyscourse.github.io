@@ -117,13 +117,21 @@ For your final project report, the team is expected to write a final report (up 
 
 You are required to submit your codes and final report in the [MLSys 2021 format](https://media.mlsys.org/Conferences/MLSYS2021/Styles/mlsys2021style.zip) (PDF) to the Gradescope. Again, please make sure you mark your partner as a collaborator on Gradescope and that all names are listed in the final report. -->
 
-<!--
 ***
 
-## Late Policy
+## Homework Late Policy
 
-TBD.
--->
+You will have **5 late days** in total to use throughout the course.
+At most **two** can be used on any single assignment.
+You can get partial credit on most homeworks.
+**Late days can only be used on the homeworks**, and not on the final project proposal or final report.
+
+If any situation comes up that you feel requires an additional extension,
+please get in touch with the instructors right away.
+We can grant extensions for extenuating circumstances,
+but it's important to contact us early to let us know the situation,
+rather than waiting until right before the deadline.
+
 
 <!-- Each student has a total of **7 grace days** that may be applied to the assignments EXCEPT FOR the final course project report and presentation in order to make sure grading is done by the school-wide deadline. **No more than 3 grace days may be used on any single assignment**.
 
