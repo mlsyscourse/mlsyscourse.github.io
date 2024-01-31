@@ -37,8 +37,8 @@
 - date: 01/31 Wed
   lecturer: Chen
   title: >
-    Week 3: <strong>Optimizing Linear Algebra</strong>
-  slides:
+    Week 3: <strong>Hardware Acceleration</strong>
+  slides: /slides/05-hardware-acceleration.pdf
   notes:
   readings:
   logistics:
