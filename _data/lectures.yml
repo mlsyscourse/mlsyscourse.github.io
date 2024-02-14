@@ -32,7 +32,7 @@
   slides: /slides/04-automatic-differentiation.pdf
   notes:
   readings:
-  logistics: <a href="https://github.com/mlsyscourse/homework1">Lab 1 Release</a>
+  logistics: <a href="https://github.com/mlsyscourse/homework1/blob/main/mlsys_hw1.ipynb">Lab 1 Release</a>
 
 - date: 01/31 Wed
   lecturer: Chen
@@ -77,7 +77,7 @@
   notes:
   slides:
   readings:
-  logistics: Lab 2 Release (Tentative)
+  logistics: <a href="https://github.com/mlsyscourse/homework2/blob/main/mlsys_hw2.ipynb">Lab 2 Release</a>
 
 - date: 02/19 Mon
   lecturer: Chen
@@ -113,7 +113,7 @@
   slides:
   notes:
   readings:
-  logistics: Lab 2 Due, Lab 3 Release (Tentative)
+  logistics: Lab 2 Due
 
 
 - date: 03/04 Mon
@@ -139,7 +139,7 @@
     Week 9: <strong>LLMs: Introduction to Transformers + Attention</strong>
   slides:
   readings:
-  logistics:
+  logistics: Lab 3 Release
 
 - date: 03/13 Wed
   lecturer: Jia
@@ -166,7 +166,7 @@
   slides:
   notes:
   readings:
-  logistics: Lab 3 Due (Tentative)
+  logistics:
 
 
 - date: 03/25 Mon
@@ -176,7 +176,7 @@
   slides:
   notes:
   readings:
-  logistics:
+  logistics: Lab 3 Due
 
 
 - date: 03/27 Wed
