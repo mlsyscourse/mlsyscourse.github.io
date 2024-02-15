@@ -80,7 +80,7 @@
   logistics: <a href="https://github.com/mlsyscourse/homework2/blob/main/mlsys_hw2.ipynb">Lab 2 Release</a>
 
 - date: 02/19 Mon
-  lecturer: Chen
+  lecturer: Jia
   title: >
     Week 6: <strong>Graph-level Optimization</strong>
   notes:
@@ -88,9 +88,9 @@
   logistics:
 
 - date: 02/21 Wed
-  lecturer: Chen
+  lecturer: Jia
   title: >
-    Week 6: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
+    Week 6: <strong>ML Parallelization (model and pipeline parallelism)</strong>
   slides:
   notes:
   readings:
@@ -107,9 +107,9 @@
 
 
 - date: 02/28 Wed
-  lecturer: Jia
+  lecturer: Chen
   title: >
-    Week 7: <strong>ML Parallelization (model and pipeline parallelism)</strong>
+    Week 7: <strong>Memory Optimization</strong>
   slides:
   notes:
   readings:
