@@ -90,7 +90,7 @@
 - date: 02/21 Wed
   lecturer: Jia
   title: >
-    Week 6: <strong>ML Parallelization (model and pipeline parallelism)</strong>
+    Week 6: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
   slides:
   notes:
   readings:
@@ -99,7 +99,7 @@
 - date: 02/26 Mon
   lecturer: Jia
   title: >
-    Week 7: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
+    Week 7: <strong>ML Parallelization (model and pipeline parallelism)</strong>
   slides:
   notes:
   readings:
@@ -160,7 +160,7 @@
   logistics:
 
 - date: 03/20 Wed
-  lecturer: Chen
+  lecturer: Jia
   title: >
     Week 10: <strong>LLMs Training: Parameter-Efficient Fine-tuning (LoRA) </strong>
   slides:
