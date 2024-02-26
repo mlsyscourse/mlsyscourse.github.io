@@ -101,7 +101,7 @@
   lecturer: Jia
   title: >
     Week 7: <strong>ML Parallelization (model and pipeline parallelism)</strong>
-  slides:
+  slides: /slides/10-ML-parallelization-part2.pdf
   notes:
   readings:
   logistics:
