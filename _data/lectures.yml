@@ -83,7 +83,7 @@
   lecturer: Jia
   title: >
     Week 6: <strong>Graph-level Optimization</strong>
-  notes: 
+  notes:
   slides: /slides/08-graph-level-optimizations.pdf
   readings:
   logistics:
@@ -111,7 +111,7 @@
   lecturer: Chen
   title: >
     Week 7: <strong>Memory Optimization</strong>
-  slides:
+  slides: /slides/11-memory-optimization.pdf
   notes:
   readings:
   logistics: Lab 2 Due
