@@ -145,8 +145,8 @@
 - date: 03/13 Wed
   lecturer: Jia
   title: >
-    Week 9: <strong>LLMs: Attention Optimizations (Flash/Paged Attention)</strong>
-  slides:
+    Week 9: <strong>LLMs: Attention Optimizations</strong>
+  slides: /slides/13-attention-optimizations.pdf
   notes:
   readings:
 
