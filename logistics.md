@@ -37,17 +37,11 @@ Grades will be based on the following parts:
   * Each of three assignments: 15%
 * Course Project: 45%
   * Proposal: 5%
-  * Poster presentation: 10%
+  * Poster presentation: 5%
   * Recorded presentation: 10%
-  * Project report: 20%
+  * Project report: 25%
 
 You will submit all your work to Gradescope.
-
-<!--
-### Submission in GradeScope
-
-TBD.
--->
 
 <!-- For the course project or presentation, you may work in groups of up to two or three students total. Only one person should submit the writeup and code on Gradescope. Make sure you **mark your partner as a collaborator on Gradescope** and that both names are listed in the writeup.
 
@@ -57,21 +51,18 @@ TBD.
 
 **Paper presentation submission**: Students are required to submit slides in **PDF**. -->
 
-<!--
 ***
 
 ## Course Project
--->
 
-<!-- The course project will be completed by group of two to three students. We have potential candidate project ideas in the area of machine learning and system [(link)](https://docs.google.com/document/d/1t_lNGniPy6-NR3Jyi5tmk0NF5jA1OIuLtyiL9KBg17Y/edit?usp=sharing). Still, you are also more than welcome to bring your own ideas that are related to your research. The Course project will have the following three components:
+The course project will be completed by group of one to three students. We have potential candidate project ideas in the area of machine learning and system [(link)](https://docs.google.com/document/d/1t_lNGniPy6-NR3Jyi5tmk0NF5jA1OIuLtyiL9KBg17Y/edit?usp=sharing). [This link](https://drive.google.com/drive/folders/1ETBmnzSqBe__zTU1zhGBFjO_CS3cTp_s?usp=sharing) includes the final reports of several MLSys projects conducted by students in previous semesters, which can be used as a reference to define the scope of yours. Still, you are also more than welcome to bring your own ideas that are related to your research. The Course project will have the following three components:
 
 - One-page proposal (5%)
 - Intrermediate check-in (no grading)
-- Final course project presentation (15%)
-- Final course project report (40%)
+- Final course project presentation: poster and recorded talk (15%)
+- Final course project report (25%)
 
-
-### One-page proposal (Deadline: Mar 5 (Fri), 11:59 pm EST)
+### One-page proposal (Deadline: Mar 31 (Sun), 11:59 pm EST)
 
 For one-page proposal, The team is expected to write the following components:
 
@@ -84,25 +75,16 @@ For one-page proposal, The team is expected to write the following components:
 You can submit one-page proposal in any format (PDF) to the Gradescope. Note that we understand that any component of the initial proposal can change dramatically over the course of your project. This proposal is to make sure everyone has a concrete idea of what to work on.
 
 
-### Intermediate check-in (Deadline: April 18 (Sun), 23:59 EST)
+### Intermediate check-in (Deadline: April 21 (Sun), 23:59 EST)
 
 As an intermediate check-in of course project, we require you to come to OH to discuss your course project with us or send us a short update note through an email until April 18 23:59 EST; note that this replaces a lightning talk we originally described on the website to reduce your burden. Any of OH from one of us counts and we won’t grade it. The goal is to make sure your project is in the right direction and help you resolve any issues in your project. 
 
 
-### Final course project presentation (Deadline: May 11 (Tue) or May 13 (Thu), 10:40 AM EST)
+### Final course project presentation (Deadline: May 3 (Friday), 5:30-8:30pm EST)
 
-We require every team to present the final course project. Please submit your slides to the Gradescope until the deadline. For the format and rubric, please refer to the following.
+We require every team to present the final course project. Please submit your slides and recorded presentation to Gradescope until the deadline. Your presentation should include the following aspects: introduction and overview of your project, problem statement, related work. method, and evaluation.
 
-- Introduction and overview of your project: 4 points
-- Problem: 3 points
-- Related work: 3 points
-- Method: 4 points
-- Evaluation: 4 points
-- Timed correctly: 2 points (17 mins for presentation, 3 mins for questions)
-
-Note that the deadline depends on the day (May 11 or May 13) your team is assigned to. For example, if your team is assigned to May 11, then the deadline is May 11, 10:40 AM EST.
-
-### Final course project report (Deadline: May 13 (Thu), 11:59 PM EST)
+### Final course project report (Deadline: May 5 (Sunday), 11:59 PM EST)
 
 For your final project report, the team is expected to write a final report (up to 8 pages without references) that generally follows the format of publication in the MLSys conference with following components:
 
@@ -115,7 +97,7 @@ For your final project report, the team is expected to write a final report (up 
 - Evaluation: How did you evaluate your system? What are experimental settings (e.g., hardware)? If any, what datasets did you use? What are evaluation metrics and hyperparameters?
 - Conclusion: Summarize your work in a single paragraph
 
-You are required to submit your codes and final report in the [MLSys 2021 format](https://media.mlsys.org/Conferences/MLSYS2021/Styles/mlsys2021style.zip) (PDF) to the Gradescope. Again, please make sure you mark your partner as a collaborator on Gradescope and that all names are listed in the final report. -->
+You are required to submit your codes and final report in the [MLSys 2021 format](https://media.mlsys.org/Conferences/MLSYS2021/Styles/mlsys2021style.zip) (PDF) to the Gradescope. Again, please make sure you mark your partner as a collaborator on Gradescope and that all names are listed in the final report.
 
 ***
 
