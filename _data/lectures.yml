@@ -155,7 +155,7 @@
   lecturer: Jia
   title: >
     Week 10: <strong>LLMs Serving: Continuous Batching, Speculative Decoding </strong>
-  slides:
+  slides: /slides/14-LLM-serving.pdf
   notes:
   readings:
   logistics:
@@ -171,9 +171,9 @@
 
 
 - date: 03/25 Mon
-  lecturer: Both
+  lecturer: Tianyu Gao (Princeton)
   title: >
-    Week 11: <i>Meetings to discuss project ideas</i>
+    Week 11: <strong>LLMs: Long-Context Generation</strong>
   slides:
   notes:
   readings:
@@ -181,13 +181,13 @@
 
 
 - date: 03/27 Wed
-  lecturer: Zhihao Zhang
+  lecturer: Both
   title: >
-    Week 11: <strong>LLMs: Retrieval-Augmented Generation</strong>
+    Week 11: <i>Meetings to discuss project ideas</i>
   slides:
   notes:
   readings:
-  logistics: Project Proposal Due (Tentative)
+  logistics: 
 
 
 - date: 04/01 Mon
@@ -197,6 +197,7 @@
   slides:
   notes:
   readings:
+  logistics: Project Proposal Due (Tentative)
 
 
 
