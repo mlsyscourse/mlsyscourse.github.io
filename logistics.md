@@ -55,14 +55,14 @@ You will submit all your work to Gradescope.
 
 ## Course Project
 
-The course project will be completed by group of one to three students. We have potential candidate project ideas in the area of machine learning and system [(link)](https://docs.google.com/document/d/1t_lNGniPy6-NR3Jyi5tmk0NF5jA1OIuLtyiL9KBg17Y/edit?usp=sharing). [This link](https://drive.google.com/drive/folders/1ETBmnzSqBe__zTU1zhGBFjO_CS3cTp_s?usp=sharing) includes the final reports of several MLSys projects conducted by students in previous semesters, which can be used as a reference to define the scope of yours. Still, you are also more than welcome to bring your own ideas that are related to your research. The Course project will have the following three components:
+The course project will be completed by group of one to three students. We have provided potential [candidate project ideas](https://docs.google.com/document/d/1fzPp3RwmjGEhFWqQcYiriuXdJB_UKpCx4WmV4Ai_sXc/edit?usp=sharing) in the area of machine learning and system. If you are interested in what has been done in previous classes, [this link](https://drive.google.com/drive/folders/1ETBmnzSqBe__zTU1zhGBFjO_CS3cTp_s?usp=sharing) includes the final reports of several MLSys projects, which can be used as a reference to define the scope of yours. Still, you are also more than welcome to bring your own ideas that are related to your research. The Course project will have the following three components:
 
 - One-page proposal (5%)
 - Intrermediate check-in (no grading)
 - Final course project presentation: poster and recorded talk (15%)
 - Final course project report (25%)
 
-### One-page proposal (Deadline: Mar 31 (Sun), 11:59 pm EST)
+### One-page proposal (Deadline: April 1 (Mon), 11:59 pm EST)
 
 For one-page proposal, The team is expected to write the following components:
 
