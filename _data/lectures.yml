@@ -154,7 +154,7 @@
 - date: 03/18 Mon
   lecturer: Jia
   title: >
-    Week 10: <strong>LLMs Serving: Continuous Batching, Speculative Decoding </strong>
+    Week 10: <strong>LLMs Serving Techniques </strong>
   slides: /slides/14-LLM-serving.pdf
   notes:
   readings:
@@ -163,8 +163,8 @@
 - date: 03/20 Wed
   lecturer: Jia
   title: >
-    Week 10: <strong>LLMs Training: Parameter-Efficient Fine-tuning (LoRA) </strong>
-  slides:
+    Week 10: <strong>LLMs Finetuning Techniques </strong>
+  slides: /slides/15-LLM-finetuning.pdf
   notes:
   readings:
   logistics:
