@@ -187,14 +187,14 @@
   slides:
   notes:
   readings:
-  logistics: 
+  logistics:
 
 
 - date: 04/01 Mon
   lecturer: Chen
   title: >
     Week 12: <strong>LLMs: Mixture of Experts</strong>
-  slides:
+  slides:  /slides/16-mixture-of-experts.pdf
   notes:
   readings:
   logistics: Project Proposal Due (Tentative)
