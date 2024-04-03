@@ -204,7 +204,8 @@
 - date: 04/03 Wed
   lecturer: Jia
   title: >
-    Week 12: <strong>Advanced topics: Automated ML Parallelization</strong>
+    Week 12: <strong>Advanced topics: Lessons Learned from MLSys Research</strong>
+  slides: /slides/17-lessons-from-mlsys.pdf
   notes:
   readings:
   logistics:
