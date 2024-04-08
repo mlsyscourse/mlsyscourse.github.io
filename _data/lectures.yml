@@ -214,15 +214,16 @@
 - date: 04/08 Mon
   lecturer: Chen
   title: >
-    Week 13: <strong>Advanced topics</strong>
+    Week 13: <strong>Advanced topics: Universal LLM Deployment with ML Compilation</strong>
   notes:
+  slides: /slides/18-advanced-topic-mlc.pdf
   readings:
   logistics:
 
 - date: 04/10 Wed
-  lecturer:
+  lecturer: Lei Li
   title: >
-    Week 13: <strong>Guest Lecture</strong>
+    Week 13: <strong>Guest Lecture: Assessing and Improving Large Language Models</strong>
   logistics:
 
 - date: 04/15 Mon
