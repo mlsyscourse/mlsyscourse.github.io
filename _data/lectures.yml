@@ -246,10 +246,24 @@
     Week 15: <strong></strong>
   logistics:
 
-
-- date: 04/24 Wed
+- date: 05/02 Thu
   lecturer:
   title: >
-    Week 15: <strong>Final Presentations</strong>
+    Week 17:
   logistics:
-  readings: Project Recording and Poster Due
+  readings: Project Presentation Video Recording Due
+
+- date: 05/03 Fri
+  lecturer:
+  title: >
+    Week 17: <strong>Final Poster Presentations</strong>
+  logistics:
+  readings: 
+
+- date: 05/05 Sun
+  lecturer:
+  title: >
+    Week 17:
+  logistics:
+  readings: Final Report Due
+
