@@ -176,7 +176,7 @@
     Week 11: <strong>LLMs: Long-Context Generation</strong>
   slides:
   notes:
-  readings:
+  readings: /slides/19-guest-lecture-long-context.pdf
   logistics: Lab 3 Due
 
 
@@ -227,10 +227,10 @@
   logistics:
 
 - date: 04/15 Mon
-  lecturer:
+  lecturer: Beidi Chen
   title: >
     Week 14: <strong>Guest Lecture</strong>
-  slides:
+  slides: /slides/21-guest-lecture-speculative-decoding.pdf
   notes:
 
 - date: 04/17 Wed
@@ -250,8 +250,8 @@
   lecturer:
   title: >
     Week 17:
-  logistics:
-  readings: Project Presentation Video Recording Due
+  logistics: Project Presentation Video Recording Due
+  readings: 
 
 - date: 05/03 Fri
   lecturer:
@@ -264,6 +264,6 @@
   lecturer:
   title: >
     Week 17:
-  logistics:
-  readings: Final Report Due
+  logistics: Final Report Due
+  readings: 
 
