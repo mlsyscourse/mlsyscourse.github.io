@@ -174,9 +174,9 @@
   lecturer: Tianyu Gao (Princeton)
   title: >
     Week 11: <strong>LLMs: Long-Context Generation</strong>
-  slides:
+  slides: /slides/19-guest-lecture-long-context.pdf
   notes:
-  readings: /slides/19-guest-lecture-long-context.pdf
+  readings: 
   logistics: Lab 3 Due
 
 
