@@ -176,7 +176,7 @@
     Week 11: <strong>LLMs: Long-Context Generation</strong>
   slides: /slides/19-guest-lecture-long-context.pdf
   notes:
-  readings: 
+  readings:
   logistics: Lab 3 Due
 
 
@@ -224,6 +224,7 @@
   lecturer: Lei Li
   title: >
     Week 13: <strong>Guest Lecture: Assessing and Improving Large Language Models</strong>
+  slides:  https://www.cs.cmu.edu/~leili/TALKS/LLM_assessment_improving_2024.4.pdf
   logistics:
 
 - date: 04/15 Mon
@@ -251,19 +252,18 @@
   title: >
     Week 17:
   logistics: Project Presentation Video Recording Due
-  readings: 
+  readings:
 
 - date: 05/03 Fri
   lecturer:
   title: >
     Week 17: <strong>Final Poster Presentations</strong>
   logistics:
-  readings: 
+  readings:
 
 - date: 05/05 Sun
   lecturer:
   title: >
     Week 17:
   logistics: Final Report Due
-  readings: 
-
+  readings:
