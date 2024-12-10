@@ -5,33 +5,15 @@ Instructors:
       office-hours: upon request
       image: staff/tqchen.jpg
 
-    - name: Zhihao Jia
-      email: zhihao@cmu.edu
-      url: https://www.cs.cmu.edu/~zhihaoj2/
-      office-hours: upon request
-      image: staff/jiazhihao.jpg
-
 TAs:
-    - name: Hongyi Jin
-      email: hongyij@cs.cmu.edu
-      url: https://www.linkedin.com/in/hongyi-jin-97b943250/
-      office-hours: Friday 4:30-5:30pm GHC 8115
-      image: staff/hongyij.jpg
+    - name: Bohan Hou
+      email: bohanhou@andrew.cmu.edu
+      url: https://spectrometerhbh.github.io
+      office-hours: TBD
+      image: staff/bohanhou.jpg
 
     - name: Ruihang Lai
       email: ruihangl@cs.cmu.edu
       url: https://ruihanglai.com
-      office-hours: Tuesday 10-11am GHC 8228
+      office-hours: TBD
       image: staff/ruihangl.jpg
-
-    - name: Gabriele Oliaro
-      email: goliaro@cs.cmu.edu
-      url: https://www.gabrieleoliaro.com
-      office-hours: Monday 5-6pm GHC 8115
-      image: staff/gabriele.jpg
-
-    - name: Zhihao Zhang
-      email: zhihaoz3@cs.cmu.edu
-      url: https://jackfram.github.io
-      office-hours: Wednesday 5-6pm GHC 6121
-      image: staff/zhihaozhang.jpg

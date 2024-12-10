@@ -1,123 +1,132 @@
-- date: 01/17 Wed
-  lecturer: Both
-  title: >
-    Week 1: <strong>Why ML Systems?</strong>
-  slides: /slides/01-course-introduction.pdf
-  notes:
-  readings:
-  logistics:
-
-- date: 01/22 Mon
+- date: 01/13 Mon
   lecturer: Chen
   title: >
-    Week 2: <strong>Introduction to deep learning and programming abstraction</strong>
-  slides: /slides/02-deep-learning-programming-abstraction.pdf
+    Week 1: <strong>Why ML Systems?</strong>
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 01/24 Wed
+- date: 01/15 Wed
+  lecturer: Chen
+  title: >
+    Week 1: <strong>Introduction to deep learning and programming abstraction</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 01/20 Mon
+  lecturer:
+  title: >
+    Week 2: <strong>MLK Jr Day. No Class.</strong>
+  slides:
+  notes:
+  readings:
+  logistics:
+
+- date: 01/22 Wed
   lecturer: Chen
   title: >
     Week 2: <strong>Introduction to Machine Learning Systems</strong>
-  slides: /slides/03-introduction-to-MLSys.pdf
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 01/29 Mon
+- date: 01/27 Mon
   lecturer: Chen
   title: >
     Week 3: <strong>Automatic Differentiation</strong>
-  slides: /slides/04-automatic-differentiation.pdf
+  slides:
   notes:
   readings:
-  logistics: <a href="https://github.com/mlsyscourse/homework1/blob/main/mlsys_hw1.ipynb">Lab 1 Release</a>
+  logistics: Lab 1 Release
 
-- date: 01/31 Wed
+- date: 01/29 Wed
   lecturer: Chen
   title: >
     Week 3: <strong>Hardware Acceleration</strong>
-  slides: /slides/05-hardware-acceleration.pdf
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 02/05 Mon
-  lecturer: Jia
+- date: 02/03 Mon
+  lecturer: Chen
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (1)</strong>
-  slides: /slides/06-CUDA-programming.pdf
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 02/07 Wed
-  lecturer: Jia
+- date: 02/05 Wed
+  lecturer: Chen
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (2)</strong>
-  slides: /slides/06-CUDA-programming.pdf
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 02/12 Mon
+- date: 02/10 Mon
   lecturer: Chen
   title: >
     Week 5: <strong>ML Compilation (1)</strong>
-  slides: /slides/07-machine-learning-compilation.pdf
+  slides:
   notes:
   readings:
   logistics: Lab 1 Due
 
-- date: 02/14 Wed
+- date: 02/12 Wed
   lecturer: Chen
   title: >
     Week 5: <strong>ML Compilation (2)</strong>
   notes:
-  slides: https://github.com/mlsyscourse/public-notebooks/blob/main/08_machine_learning_compilation_tensorir.ipynb
+  slides:
   readings:
-  logistics: <a href="https://github.com/mlsyscourse/homework2/blob/main/mlsys_hw2.ipynb">Lab 2 Release</a>
+  logistics: Lab 2 Release
 
-- date: 02/19 Mon
-  lecturer: Jia
+- date: 02/17 Mon
+  lecturer: Chen
   title: >
     Week 6: <strong>Graph-level Optimization</strong>
   notes:
-  slides: /slides/08-graph-level-optimizations.pdf
+  slides:
   readings:
   logistics:
 
-- date: 02/21 Wed
-  lecturer: Jia
+- date: 02/19 Wed
+  lecturer: Chen
   title: >
     Week 6: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
-  slides: /slides/09-ML-parallelization-part1.pdf
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 02/26 Mon
-  lecturer: Jia
+- date: 02/24 Mon
+  lecturer: Chen
   title: >
     Week 7: <strong>ML Parallelization (model and pipeline parallelism)</strong>
-  slides: /slides/10-ML-parallelization-part2.pdf
+  slides:
   notes:
   readings:
   logistics:
 
 
-- date: 02/28 Wed
+- date: 02/26 Wed
   lecturer: Chen
   title: >
     Week 7: <strong>Memory Optimization</strong>
-  slides: /slides/11-memory-optimization.pdf
+  slides:
   notes:
   readings:
   logistics: Lab 2 Due
 
 
-- date: 03/04 Mon
+- date: 03/02 Mon
   lecturer:
   title: >
     Week 8: <strong>Spring Break. No Class.</strong>
@@ -126,7 +135,7 @@
   readings:
   logistics:
 
-- date: 03/06 Wed
+- date: 03/04 Wed
   lecturer:
   title: >
     Week 8: <strong>Spring Break. No Class.</strong>
@@ -134,54 +143,54 @@
   readings:
   logistics:
 
-- date: 03/11 Mon
+- date: 03/10 Mon
   lecturer: Chen
   title: >
     Week 9: <strong>LLMs: Introduction to Transformers + Attention</strong>
-  slides: /slides/12-transformers-attention.pdf
+  slides:
   readings:
   logistics: Lab 3 Release
 
-- date: 03/13 Wed
-  lecturer: Jia
+- date: 03/12 Wed
+  lecturer: Chen
   title: >
     Week 9: <strong>LLMs: Attention Optimizations</strong>
-  slides: /slides/13-attention-optimizations.pdf
+  slides:
   notes:
   readings:
 
 
-- date: 03/18 Mon
-  lecturer: Jia
+- date: 03/17 Mon
+  lecturer: Chen
   title: >
     Week 10: <strong>LLMs Serving Techniques </strong>
-  slides: /slides/14-LLM-serving.pdf
+  slides:
   notes:
   readings:
   logistics:
 
-- date: 03/20 Wed
-  lecturer: Jia
+- date: 03/19 Wed
+  lecturer: Chen
   title: >
     Week 10: <strong>LLMs Finetuning Techniques </strong>
-  slides: /slides/15-LLM-finetuning.pdf
+  slides:
   notes:
   readings:
   logistics:
 
 
-- date: 03/25 Mon
-  lecturer: Tianyu Gao (Princeton)
+- date: 03/24 Mon
+  lecturer:
   title: >
-    Week 11: <strong>LLMs: Long-Context Generation</strong>
-  slides: /slides/19-guest-lecture-long-context.pdf
+    Week 11: <strong>Guest Lecture</strong>
+  slides:
   notes:
   readings:
   logistics: Lab 3 Due
 
 
-- date: 03/27 Wed
-  lecturer: Both
+- date: 03/26 Wed
+  lecturer: Chen
   title: >
     Week 11: <i>Meetings to discuss project ideas</i>
   slides:
@@ -190,78 +199,78 @@
   logistics:
 
 
-- date: 04/01 Mon
+- date: 03/31 Mon
   lecturer: Chen
   title: >
     Week 12: <strong>LLMs: Mixture of Experts</strong>
-  slides:  /slides/16-mixture-of-experts.pdf
+  slides: 
   notes:
   readings:
   logistics: Project Proposal Due (Tentative)
 
 
 
-- date: 04/03 Wed
-  lecturer: Jia
+- date: 04/02 Wed
+  lecturer: Chen
   title: >
     Week 12: <strong>Advanced topics: Lessons Learned from MLSys Research</strong>
-  slides: /slides/17-lessons-from-mlsys.pdf
+  slides:
   notes:
   readings:
   logistics:
 
 
-- date: 04/08 Mon
+- date: 04/07 Mon
   lecturer: Chen
   title: >
     Week 13: <strong>Advanced topics: Universal LLM Deployment with ML Compilation</strong>
   notes:
-  slides: /slides/18-advanced-topic-mlc.pdf
+  slides:
   readings:
   logistics:
 
-- date: 04/10 Wed
-  lecturer: Lei Li
+- date: 04/09 Wed
+  lecturer:
   title: >
-    Week 13: <strong>Guest Lecture: Assessing and Improving Large Language Models</strong>
-  slides:  https://www.cs.cmu.edu/~leili/TALKS/LLM_assessment_improving_2024.4.pdf
+    Week 13: <strong>Guest Lecture</strong>
+  slides:
   logistics:
 
-- date: 04/15 Mon
-  lecturer: Beidi Chen
+- date: 04/14 Mon
+  lecturer:
   title: >
     Week 14: <strong>Guest Lecture</strong>
-  slides: /slides/21-guest-lecture-speculative-decoding.pdf
+  slides:
   notes:
 
-- date: 04/17 Wed
+- date: 04/16 Wed
   lecturer:
   title: >
     Week 14: <strong></strong>
   logistics:
   readings:
 
-- date: 04/22 Mon
+- date: 04/21 Mon
   lecturer:
   title: >
     Week 15: <strong></strong>
   logistics:
 
-- date: 05/02 Thu
+- date: 05/01 Thu
   lecturer:
   title: >
-    Week 17:
+    Week 16:
   logistics: Project Presentation Video Recording Due
   readings:
 
-- date: 05/03 Fri
+- date: 05/02 Fri
   lecturer:
   title: >
-    Week 17: <strong>Final Poster Presentations</strong>
+    Week 16: <strong>Final Poster Presentations</strong>
   logistics:
   readings:
 
-- date: 05/05 Sun
+- date: 05/04 Sun
   lecturer:
   title: >
     Week 17:
