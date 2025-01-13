@@ -37,8 +37,7 @@ Grades will be based on the following parts:
   * Each of three assignments: 15%
 * Course Project: 45%
   * Proposal: 5%
-  * Poster presentation: 5%
-  * Recorded presentation: 10%
+  * Poster presentation: 15%
   * Project report: 25%
 
 You will submit all your work to Gradescope.
@@ -59,10 +58,10 @@ The course project will be completed by group of one to three students. We have 
 
 - One-page proposal (5%)
 - Intrermediate check-in (no grading)
-- Final course project presentation: poster and recorded talk (15%)
+- Final course project poster presentation (15%)
 - Final course project report (25%)
 
-### One-page proposal (Deadline: April 1 (Mon), 11:59 pm EST)
+### One-page proposal (Deadline: March 31 (Mon), 11:59 pm EST)
 
 For one-page proposal, The team is expected to write the following components:
 
@@ -75,16 +74,16 @@ For one-page proposal, The team is expected to write the following components:
 You can submit one-page proposal in any format (PDF) to the Gradescope. Note that we understand that any component of the initial proposal can change dramatically over the course of your project. This proposal is to make sure everyone has a concrete idea of what to work on.
 
 
-### Intermediate check-in (Deadline: April 21 (Sun), 23:59 EST)
+### Intermediate check-in (Deadline: April 20 (Sun), 23:59 EST)
 
 As an intermediate check-in of course project, we require you to come to OH to discuss your course project with us or send us a short update note through an email until April 18 23:59 EST; note that this replaces a lightning talk we originally described on the website to reduce your burden. Any of OH from one of us counts and we won’t grade it. The goal is to make sure your project is in the right direction and help you resolve any issues in your project. 
 
 
-### Final course project presentation (Deadline: May 3 (Friday), 5:30-8:30pm EST)
+### Final course project presentation (Deadline: May 2 (Friday), 5:30-8:30pm EST)
 
-We require every team to present the final course project. Please submit your slides and recorded presentation to Gradescope until the deadline. Your presentation should include the following aspects: introduction and overview of your project, problem statement, related work. method, and evaluation.
+We require every team to present the final course project. Please submit your poster to Gradescope until the deadline. Your presentation should include the following aspects: introduction and overview of your project, problem statement, related work. method, and evaluation.
 
-### Final course project report (Deadline: May 5 (Sunday), 11:59 PM EST)
+### Final course project report (Deadline: May 4 (Sunday), 11:59 PM EST)
 
 For your final project report, the team is expected to write a final report (up to 8 pages without references) that generally follows the format of publication in the MLSys conference with following components:
 
