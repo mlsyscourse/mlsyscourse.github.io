@@ -37,8 +37,8 @@ Grades will be based on the following parts:
   * Each of three assignments: 15%
 * Course Project: 45%
   * Proposal: 5%
-  * Poster presentation: 15%
-  * Project report: 25%
+  * Poster presentation: 20%
+  * Project report: 20%
 
 You will submit all your work to Gradescope.
 
