@@ -2,7 +2,7 @@
   lecturer: Chen
   title: >
     Week 1: <strong>Why ML Systems?</strong>
-  slides:
+  slides: /slides/01-course-introduction.pdf
   notes:
   readings:
   logistics:
@@ -203,7 +203,7 @@
   lecturer: Chen
   title: >
     Week 12: <strong>LLMs: Mixture of Experts</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics: Project Proposal Due (Tentative)
@@ -267,5 +267,5 @@
   lecturer:
   title: >
     Week 17: Final Report Due
-  logistics: 
+  logistics:
   readings:
