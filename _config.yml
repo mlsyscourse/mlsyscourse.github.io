@@ -35,5 +35,5 @@ navigation:
     link: /logistics
   - title: Schedule
     link: /schedule
-  # - title: Materials
-  #   link: /materials
+  - title: Materials
+    link: /materials
