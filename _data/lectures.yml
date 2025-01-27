@@ -38,7 +38,7 @@
   lecturer: Chen
   title: >
     Week 3: <strong>Automatic Differentiation</strong>
-  slides:
+  slides: /slides/04-automatic-differentiation.pdf
   notes:
   readings:
   logistics: Lab 1 Release
