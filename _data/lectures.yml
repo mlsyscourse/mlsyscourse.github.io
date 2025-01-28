@@ -41,7 +41,7 @@
   slides: /slides/04-automatic-differentiation.pdf
   notes:
   readings:
-  logistics: [Lab 1 Release](https://github.com/mlsyscourse/assignment1)
+  logistics: <a href="https://github.com/mlsyscourse/assignment1">Lab 1 Release</a>
 
 - date: 01/29 Wed
   lecturer: Chen
