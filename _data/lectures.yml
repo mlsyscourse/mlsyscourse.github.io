@@ -65,7 +65,7 @@
   lecturer: Chen
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (2)</strong>
-  slides:
+  slides: /slides/06-CUDA-programming.pdf
   notes:
   readings:
   logistics:
@@ -74,7 +74,7 @@
   lecturer: Chen
   title: >
     Week 5: <strong>ML Compilation (1)</strong>
-  slides:
+  slides: /slides/07-machine-learning-compilation.pdf
   notes:
   readings:
   logistics: Lab 1 Due
