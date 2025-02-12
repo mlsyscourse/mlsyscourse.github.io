@@ -84,7 +84,7 @@
   title: >
     Week 5: <strong>ML Compilation (2)</strong>
   notes:
-  slides:
+  slides: https://github.com/mlsyscourse/public-notebooks/blob/main/08_machine_learning_compilation_tensorir.ipynb
   readings:
   logistics: <a href="https://github.com/mlsyscourse/assignment2">Lab 2 Release</a>
 
