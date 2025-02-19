@@ -101,7 +101,7 @@
   lecturer: Chen
   title: >
     Week 6: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
-  slides:
+  slides: /slides/09-ML-parallelization-part1.pdf
   notes:
   readings:
   logistics:
