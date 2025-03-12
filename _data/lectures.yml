@@ -155,7 +155,7 @@
   lecturer: Chen
   title: >
     Week 9: <strong>LLMs: Attention Optimizations</strong>
-  slides:
+  slides: /slides/13-attention-optimizations.pdf
   notes:
   readings:
 
