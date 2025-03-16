@@ -161,7 +161,7 @@
 
 
 - date: 03/17 Mon
-  lecturer: Chen
+  lecturer: Zhihao Jia
   title: >
     Week 10: <strong>LLMs Serving Techniques </strong>
   slides:
@@ -170,7 +170,7 @@
   logistics:
 
 - date: 03/19 Wed
-  lecturer: Chen
+  lecturer: Zhihao Jia
   title: >
     Week 10: <strong>LLMs Finetuning Techniques </strong>
   slides:
@@ -182,7 +182,7 @@
 - date: 03/24 Mon
   lecturer: Haibin Lin
   title: >
-    Week 11: <strong>Guest Lecture</strong>
+    Week 11: <strong>Guest Lecture: Building LLM Training Systems at Scale</strong>
   slides:
   notes:
   readings:
