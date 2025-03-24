@@ -213,7 +213,7 @@
 - date: 04/02 Wed
   lecturer: Chen
   title: >
-    Week 12: <strong>Advanced topics: Lessons Learned from MLSys Research</strong>
+    Week 12: <strong>Advanced topics: Universal LLM Deployment with ML Compilation</strong>
   slides:
   notes:
   readings:
@@ -221,25 +221,25 @@
 
 
 - date: 04/07 Mon
-  lecturer: Chen
+  lecturer:
   title: >
-    Week 13: <strong>Advanced topics: Universal LLM Deployment with ML Compilation</strong>
+    Week 13:
   notes:
   slides:
   readings:
   logistics:
 
 - date: 04/09 Wed
-  lecturer:
+  lecturer: Zihao Ye
   title: >
-    Week 13: <strong>Guest Lecture</strong>
+    Week 13: <strong>Guest Lecture: LLM Inference Optimization</strong>
   slides:
   logistics:
 
 - date: 04/14 Mon
-  lecturer:
+  lecturer: Zhihao Jia
   title: >
-    Week 14: <strong>Guest Lecture</strong>
+    Week 14: <strong>Advanced topics: Lessons Learned from MLSys Research</strong>
   slides:
   notes:
 
