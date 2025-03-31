@@ -183,7 +183,7 @@
   lecturer: Haibin Lin
   title: >
     Week 11: <strong>Guest Lecture: Building LLM Training Systems at Scale</strong>
-  slides:
+  slides: /slides/HaibinLinTalk.pdf
   notes:
   readings:
   logistics: Lab 3 Due
@@ -203,7 +203,7 @@
   lecturer: Chen
   title: >
     Week 12: <strong>LLMs: Mixture of Experts</strong>
-  slides:
+  slides: /slides/16-mixture-of-experts.pdf
   notes:
   readings:
   logistics: Project Proposal Due (Tentative)
