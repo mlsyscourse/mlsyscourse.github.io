@@ -232,7 +232,7 @@
 - date: 04/09 Wed
   lecturer: Zihao Ye
   title: >
-    Week 13: <strong>Guest Lecture: LLM Inference Optimization</strong>
+    Week 13: <strong>Guest Lecture: FlashInfer - Efficient and Customizable Kernel Generation for LLM Inference Serving</strong>
   slides:
   logistics:
 
