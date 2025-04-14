@@ -208,8 +208,6 @@
   readings:
   logistics: Project Proposal Due (Tentative)
 
-
-
 - date: 04/02 Wed
   lecturer: Chen
   title: >
@@ -240,7 +238,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 14: <strong>Advanced topics: Lessons Learned from MLSys Research</strong>
-  slides:
+  slides: /slides/17-lessons-from-mlsys.pdf
   notes:
 
 - date: 04/16 Wed
