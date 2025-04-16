@@ -231,7 +231,7 @@
   lecturer: Zihao Ye
   title: >
     Week 13: <strong>Guest Lecture: FlashInfer - Efficient and Customizable Kernel Generation for LLM Inference Serving</strong>
-  slides:
+  slides: /slides/FlashInferCMU.pdf
   logistics:
 
 - date: 04/14 Mon
