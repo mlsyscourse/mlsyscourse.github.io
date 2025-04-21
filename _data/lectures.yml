@@ -245,6 +245,7 @@
   lecturer: Tim Dettmers
   title: >
     Week 14: <strong>Guest Lecture: Efficient Foundation Models via Quantization</strong>
+  slides: /slides/tim_quantization.pdf
   logistics:
   readings:
 
