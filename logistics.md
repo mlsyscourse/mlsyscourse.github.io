@@ -83,7 +83,7 @@ As an intermediate check-in of course project, we require you to come to OH to d
 
 We require every team to present the final course project. Please submit your poster to Gradescope until the deadline. Your presentation should include the following aspects: introduction and overview of your project, problem statement, related work. method, and evaluation.
 
-### Final course project report (Deadline: May 2 (Friday), 11:59 PM EST)
+### Final course project report (Deadline: May 4 (Friday), 11:59 PM EST)
 
 For your final project report, the team is expected to write a final report (up to 8 pages without references) that generally follows the format of publication in the MLSys conference with following components:
 
