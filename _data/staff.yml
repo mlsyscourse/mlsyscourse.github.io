@@ -5,33 +5,31 @@ Instructors:
       office-hours: upon request
       image: staff/tqchen.jpg
 
+    - name: Zhihao Jia
+      email: zhihao@cmu.edu
+      url: https://www.cs.cmu.edu/~zhihaoj2/
+      office-hours: upon request
+      image: staff/jiazhihao.jpg
+
 TAs:
-    - name: Bohan Hou
-      email: bohanhou@andrew.cmu.edu
-      url: https://spectrometerhbh.github.io
-      office-hours: Tuesdays 10-11am, GHC 8228
-      image: staff/bohanhou.jpg
-
-    - name: Ruihang Lai
-      email: ruihangl@cs.cmu.edu
-      url: https://ruihanglai.com
-      office-hours: Thursdays 5-6pm, GHC 7501
-      image: staff/ruihangl.jpg
-
-    - name: Zhihao Zhang
-      email: zhihaoz3@cs.cmu.edu
-      url: https://jackfram.github.io
-      office-hours: Fridays 12-1pm, GHC 8228
-      image: staff/zhihaozhang.jpg
-
     - name: Mengdi Wu
       email: mengdiwu@cs.cmu.edu
       url: https://wmdi.github.io
-      office-hours: Wednesdays 10-11am, GHC 8228
+      office-hours: upon request
       image: staff/mengdiwu.jpg
 
     - name: Mingkuan Xu
       email: mingkuax@cs.cmu.edu
       url: https://mingkuan.taichi.graphics/
-      office-hours: TBD
+      office-hours: Thursday 4-5pm, GHC 8228
       image: staff/mingkuanxu.jpg
+
+    - name: Zepeng Zhao
+      email: zepengz@andrew.cmu.edu
+      office-hours: Tuesday 10-11am, GHC 8228
+      image: staff/zepengzhao.jpg
+
+    - name: Zikun Li
+      email: zikunl@andrew.cmu.edu
+      office-hours: Tuesday 4-5pm, GHC 8228
+      image: staff/zikun.jpg

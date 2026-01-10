@@ -15,8 +15,8 @@ This course offers the necessary background for students who would like to pursu
 
 * **Lectures**: Monday/Wednesday 3:30pm - 4:50pm.
 * **Office Hours**: Check the time below.
-* **Announcement or Discussion**: [Piazza](https://piazza.com/home/spring2025/15442)
-* **Submitting your work**: [Gradescope](https://www.gradescope.com/courses/951055)
+* **Announcement or Discussion**: [Piazza](https://piazza.com/cmu/spring2026/15442)
+* **Submitting your work**: TBD
 * **Contact**: Please make a private post in Piazza
 
 ----
