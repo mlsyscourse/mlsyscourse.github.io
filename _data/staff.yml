@@ -18,12 +18,12 @@ TAs:
       office-hours: upon request
       image: staff/mengdiwu.jpg
 
-    - name: Mingkuan Xu
-      email: mingkuax@cs.cmu.edu
-      url: https://mingkuan.taichi.graphics/
-      office-hours: Thursday 4-5pm, GHC 8228
-      image: staff/mingkuanxu.jpg
-
+    - name: Shushi Hong
+      email: tlopexh@andrew.cmu.edu
+      url: https://www.linkedin.com/in/shushi-hong-15020b2ba
+      office-hours: Monday 11am-12pm, GHC 8228
+      image: staff/shushihong.jpg
+    
     - name: Zepeng Zhao
       email: zepengz@andrew.cmu.edu
       url: https://www.linkedin.com/in/zephyr-zhao-681053304/
@@ -35,3 +35,34 @@ TAs:
       url: https://zikun-li.github.io/
       office-hours: Tuesday 4-5pm, GHC 8228
       image: staff/zikun.jpg
+
+    - name: Haojia Sun
+      email: haojias@andrew.cmu.edu
+      url:
+      office-hours: Wednesday 2-3pm, GHC 8228
+      image: staff/haojiasun.jpg
+    
+    - name: Siyuan Chen
+      email: siyuanc3@andrew.cmu.edu
+      url: https://gulang2019.github.io
+      office-hours: Thursday 2-3pm, GHC 8228
+      image: staff/siyuanchen.jpg
+    
+    - name: Mingkuan Xu
+      email: mingkuax@cs.cmu.edu
+      url: https://mingkuan.taichi.graphics/
+      office-hours: Thursday 4-5pm, GHC 8228
+      image: staff/mingkuanxu.jpg
+
+    - name: Yixin Dong
+      email: yixind@andrew.cmu.edu
+      url: https://github.com/ubospica
+      office-hours: Friday 10-11am, GHC 8228
+      image: staff/yixindong.jpg
+
+    - name: Zhuoming Chen
+      email: zhuominc@andrew.cmu.edu
+      url: https://www.linkedin.com/in/zhuoming-chen-325075234/
+      office-hours: Friday 3-4pm, GHC 8228
+      image: staff/zhuomingchen.jpg
+    
