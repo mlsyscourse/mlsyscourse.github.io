@@ -2,10 +2,10 @@
   lecturer: Tianqi Chen
   title: >
     Week 1: <strong>Why ML Systems?</strong>
-  slides:
+  slides: /slides/01-course-introduction.pdf
   notes:
   readings:
-  logistics: /slides/01-course-introduction.pdf
+  logistics:
 
 - date: 01/14 Wed
   lecturer: Tianqi Chen
