@@ -2,16 +2,16 @@
   lecturer: Tianqi Chen
   title: >
     Week 1: <strong>Why ML Systems?</strong>
-  slides: 
+  slides:
   notes:
   readings:
-  logistics:
+  logistics: /slides/01-course-introduction.pdf
 
 - date: 01/14 Wed
   lecturer: Tianqi Chen
   title: >
     Week 1: <strong>Introduction to Machine Learning Systems</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -29,7 +29,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 2: <strong>Intro to deep learning and programming abstraction</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -38,7 +38,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 3: <strong>Automatic Differentiation</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics: Lab 1 Release
@@ -47,7 +47,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 3: <strong>Optimizing Linear Algbera</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -56,7 +56,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (1)</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -65,7 +65,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (2)</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -74,17 +74,17 @@
   lecturer: Zhihao Jia
   title: >
     Week 5: <strong>Case study: Transformer, Attention, Optimizations</strong>
-  slides: 
+  slides:
   notes:
   readings:
-  logistics: 
+  logistics:
 
 - date: 02/11 Wed
   lecturer: Zhihao Jia
   title: >
     Week 5: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
   notes:
-  slides: 
+  slides:
   readings:
   logistics: Lab 1 Due
 
@@ -93,7 +93,7 @@
   title: >
     Week 6: <strong>ML Parallelization (model and pipeline parallelism)</strong>
   notes:
-  slides: 
+  slides:
   readings:
   logistics: Lab 2 Release
 
@@ -101,7 +101,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 6: <strong>ML Compiler (1)</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -110,7 +110,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 7: <strong>ML Compiler (2) - autotuning</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -120,10 +120,10 @@
   lecturer: Tianqi Chen
   title: >
     Week 7: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
-  slides: 
+  slides:
   notes:
   readings:
-  logistics: 
+  logistics:
 
 
 - date: 03/02 Mon
@@ -147,15 +147,15 @@
   lecturer: Zhihao Jia
   title: >
     Week 9: <strong>LLMs: Serving (speculative decoding, continuous batching)</strong>
-  slides: 
+  slides:
   readings:
   logistics: Lab 3 Release; Lab 2 Due
 
 - date: 03/11 Wed
-  lecturer: 
+  lecturer:
   title: >
     Week 9: <strong>Meetings to discuss project ideas with mentors</strong>
-  slides: 
+  slides:
   notes:
   readings:
 
@@ -164,7 +164,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 10: <strong>LLMs: Training (PEFT)</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -173,7 +173,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 10: <strong>LLMs: Mixture of Experts</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics:
@@ -183,10 +183,10 @@
   lecturer: Tianqi Chen
   title: >
     Week 11: <strong>Advanced topics:  Kernel DSLs and Warp Specialization</strong>
-  slides: 
+  slides:
   notes:
   readings:
-  logistics: 
+  logistics:
 
 
 - date: 03/25 Wed
@@ -203,7 +203,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 12: <strong>Advanced topics:  MegaKernels</strong>
-  slides: 
+  slides:
   notes:
   readings:
   logistics: Lab 3 Due
@@ -219,7 +219,7 @@
 
 
 - date: 04/06 Mon
-  lecturer: Zhihao Jia 
+  lecturer: Zhihao Jia
   title: >
     Week 13: <strong>Advanced topics: Automated ML Parallelization</strong>
   notes:
@@ -228,24 +228,24 @@
   logistics:
 
 - date: 04/08 Wed
-  lecturer: 
+  lecturer:
   title: >
     Week 13: <strong>Advanced topics: TBD</strong>
-  slides: 
+  slides:
   logistics:
 
 - date: 04/13 Mon
-  lecturer: 
+  lecturer:
   title: >
     Week 14: <strong>Guest Lecture: TBD</strong>
-  slides: 
+  slides:
   notes:
 
 - date: 04/15 Wed
-  lecturer: 
+  lecturer:
   title: >
     Week 14: <strong>Guest Lecture: TBD</strong>
-  slides: 
+  slides:
   logistics:
   readings:
 
@@ -259,5 +259,5 @@
   lecturer:
   title: >
     Week 16: <strong>Final Poster Presentations</strong>
-  logistics: 
+  logistics:
   readings:
