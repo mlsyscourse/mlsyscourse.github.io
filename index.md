@@ -16,7 +16,7 @@ This course offers the necessary background for students who would like to pursu
 * **Lectures**: Monday/Wednesday 3:30pm - 4:50pm.
 * **Office Hours**: Check the time below.
 * **Announcement or Discussion**: [Piazza](https://piazza.com/cmu/spring2026/15442)
-* **Submitting your work**: TBD
+* **Submitting your work**: [Autolab](https://autolab.andrew.cmu.edu/courses/15442-s26/)
 * **Contact**: Please make a private post in Piazza
 
 ----
