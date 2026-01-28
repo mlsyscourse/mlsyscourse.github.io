@@ -47,7 +47,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 3: <strong>Optimizing Linear Algbera</strong>
-  slides:
+  slides: /slides/05-hardware-acceleration.pdf
   notes:
   readings:
   logistics:
