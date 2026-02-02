@@ -56,7 +56,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (1)</strong>
-  slides:
+  slides: /slides/06-CUDA-programming.pdf
   notes:
   readings:
   logistics:
@@ -65,7 +65,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 4: <strong>GPU Architecture and CUDA Programming (2)</strong>
-  slides:
+  slides: /slides/06-CUDA-programming.pdf
   notes:
   readings:
   logistics:
