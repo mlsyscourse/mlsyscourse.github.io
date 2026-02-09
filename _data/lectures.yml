@@ -74,7 +74,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 5: <strong>Case study: Transformer, Attention, Optimizations</strong>
-  slides:
+  slides: /slides/07-transformers-attention.pdf
   notes:
   readings:
   logistics:
