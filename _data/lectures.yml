@@ -38,7 +38,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 3: <strong>Automatic Differentiation</strong>
-  slides: /slides//04-automatic-differentiation.pdf
+  slides: /slides/04-automatic-differentiation.pdf
   notes:
   readings:
   logistics: Lab 1 Release
@@ -82,9 +82,9 @@
 - date: 02/11 Wed
   lecturer: Zhihao Jia
   title: >
-    Week 5: <strong>ML Parallelization (data parallelism and zero redundancy)</strong>
+    Week 5: <strong>ML Parallelization (Data Parallelism and Zero Redundancy)</strong>
   notes:
-  slides:
+  slides: /slides/08-ML-parallelization-part1.pdf
   readings:
   logistics: Lab 1 Due
 
