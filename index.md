@@ -24,3 +24,5 @@ This course offers the necessary background for students who would like to pursu
 ### Acknowledgement
 
 We would like to thank [Modal](https://modal.com/) for sponsoring the compute credits for this course.
+
+----
