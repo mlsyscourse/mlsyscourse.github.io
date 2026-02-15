@@ -91,9 +91,9 @@
 - date: 02/16 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 6: <strong>ML Parallelization (model and pipeline parallelism)</strong>
+    Week 6: <strong>ML Parallelization (Model and Pipeline Parallelism)</strong>
   notes:
-  slides:
+  slides: /slides/09-ML-parallelization-part2.pdf
   readings:
   logistics: Lab 2 Release
 
