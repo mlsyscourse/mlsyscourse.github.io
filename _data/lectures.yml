@@ -100,7 +100,7 @@
 - date: 02/18 Wed
   lecturer: Tianqi Chen
   title: >
-    Week 6: <strong>ML Compiler (1)</strong>
+    Week 6: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
   slides:
   notes:
   readings:
@@ -109,7 +109,7 @@
 - date: 02/23 Mon
   lecturer: Tianqi Chen
   title: >
-    Week 7: <strong>ML Compiler (2) - autotuning</strong>
+    Week 7: <strong>ML Compiler - Data Layouts</strong>
   slides:
   notes:
   readings:
@@ -119,7 +119,7 @@
 - date: 02/25 Wed
   lecturer: Tianqi Chen
   title: >
-    Week 7: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
+    Week 7: <strong>ML Compiler (2)</strong>
   slides:
   notes:
   readings:

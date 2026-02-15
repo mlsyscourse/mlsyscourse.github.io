@@ -20,3 +20,9 @@ This course offers the necessary background for students who would like to pursu
 * **Contact**: Please make a private post in Piazza
 
 ----
+
+### Acknowledgement
+
+We would like to thank [Modal](https://modal.com/) for sponsoring the compute credits for this course.
+
+----
