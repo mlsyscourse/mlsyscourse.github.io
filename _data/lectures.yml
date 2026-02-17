@@ -101,7 +101,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 6: <strong>Memory Optimizations: Tensor Rematerialization and Offload</strong>
-  slides:
+  slides: /slides/11-memory-optimization.pdf
   notes:
   readings:
   logistics:
