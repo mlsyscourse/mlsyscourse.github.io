@@ -110,7 +110,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 7: <strong>ML Compiler - Data Layouts</strong>
-  slides:
+  slides: /slides/data_layout/
   notes:
   readings:
   logistics:
