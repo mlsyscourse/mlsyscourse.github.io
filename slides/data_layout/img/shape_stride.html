@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shape–Stride Model</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .panels { gap: 32px; max-width: 1200px; }
+  .panel { position: relative; padding: 14px 18px; }
+  .panel h2 { margin-bottom: 4px; }
+
+  .grid { gap: 2px; justify-content: center; }
+  .cell {
+    width: 34px; height: 34px; aspect-ratio: auto;
+    border-radius: 3px; font-size: 10px; cursor: default;
+    font-family: 'SF Mono','Fira Code', monospace; font-weight: 600;
+    border-width: 2px;
+  }
+  .cell.normal { background: #eef0f4; color: var(--text); }
+  .cell.hi-blue { background: rgba(59,130,246,0.25); border-color: #3b82f6; color: #1e40af; }
+  .cell.hi-green { background: rgba(34,197,94,0.25); border-color: #22c55e; color: #166534; }
+  .hdr { font-size: 9px; }
+  .rl { font-size: 9px; }
+
+  /* Stride annotations below grid */
+  .stride-info {
+    display: flex; justify-content: center; gap: 24px;
+    margin-top: 10px; font-size: 11px; font-weight: 600;
+    font-family: 'SF Mono','Fira Code', monospace;
+  }
+  .stride-info .s-item { display: flex; align-items: center; gap: 5px; }
+  .stride-info .s-arrow { font-size: 14px; }
+  .stride-info .s-blue { color: #3b82f6; }
+  .stride-info .s-green { color: #22c55e; }
+  .stride-info .s-gray { color: #666; }
+</style>
+</head>
+<body class="figure">
+
+<h1>Shape–Stride Model</h1>
+<div class="sub">S[(rows, cols) : (stride_row, stride_col)]</div>
+
+<div class="panels">
+  <div class="panel">
+    <h2>Row-major</h2>
+    <div class="nota">S[(8, 8) : (8, 1)]</div>
+    <div class="grid" id="g-row"></div>
+    <div class="stride-info">
+      <div class="s-item s-blue"><span class="s-arrow">&rarr;</span> stride_col = 1 (contiguous)</div>
+      <div class="s-item s-gray"><span class="s-arrow">&darr;</span> stride_row = 8</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Column-major</h2>
+    <div class="nota">S[(8, 8) : (1, 8)]</div>
+    <div class="grid" id="g-col"></div>
+    <div class="stride-info">
+      <div class="s-item s-gray"><span class="s-arrow">&rarr;</span> stride_col = 8</div>
+      <div class="s-item s-green"><span class="s-arrow">&darr;</span> stride_row = 1 (contiguous)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const N = 8;
+
+function buildGrid(id, indexFn, highlightFn, hiClass) {
+  const g = document.getElementById(id);
+  g.style.gridTemplateColumns = '20px repeat(' + N + ', 34px)';
+
+  // Corner
+  g.appendChild(Object.assign(document.createElement('div'), { className: 'hdr' }));
+  // Column headers
+  for (let c = 0; c < N; c++) {
+    const h = document.createElement('div'); h.className = 'hdr'; h.textContent = c; g.appendChild(h);
+  }
+  // Rows
+  for (let r = 0; r < N; r++) {
+    const rl = document.createElement('div'); rl.className = 'rl'; rl.textContent = r; g.appendChild(rl);
+    for (let c = 0; c < N; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell ' + (highlightFn(r, c) ? hiClass : 'normal');
+      cell.textContent = indexFn(r, c);
+      g.appendChild(cell);
+    }
+  }
+}
+
+// Row-major: flat index = r*8 + c, highlight row 0
+buildGrid('g-row', (r, c) => r * N + c, (r, c) => r === 0, 'hi-blue');
+
+// Column-major: flat index = c*8 + r, highlight column 0
+buildGrid('g-col', (r, c) => c * N + r, (r, c) => c === 0, 'hi-green');
+</script>
+</body>
+</html>

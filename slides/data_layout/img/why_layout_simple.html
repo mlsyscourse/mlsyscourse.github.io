@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Data Layout: Matrix to Memory</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .wrap {
+    display: flex; align-items: center; justify-content: flex-start; gap: 48px;
+    max-width: 1400px; margin: 30px 0 0; padding: 0 24px 0 100px;
+  }
+  .label { font-size: 15px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 10px; }
+
+  /* Matrix */
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 24px repeat(4, 56px);
+    grid-template-rows: 24px repeat(4, 56px);
+    gap: 3px;
+  }
+  .hdr { font-size: 10px; color: var(--dim); font-weight: 600; display: flex; align-items: center; justify-content: center;
+    font-family: 'SF Mono','Fira Code', monospace; }
+  .m-cell {
+    border-radius: 5px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; font-family: 'SF Mono','Fira Code', monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+
+  /* Arrow */
+  .arrow { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .arrow-label { font-size: 12px; color: var(--dim); font-family: 'SF Mono','Fira Code', monospace; font-weight: 600; }
+
+  /* Flat memory strip - horizontal */
+  .mem-strip { display: flex; gap: 2px; }
+  .mem-cell {
+    width: 40px; height: 40px; border-radius: 5px; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; font-family: 'SF Mono','Fira Code', monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+  .mem-addrs { display: flex; gap: 2px; margin-top: 2px; }
+  .mem-addr { width: 40px; text-align: center; font-size: 8px; color: var(--dim);
+    font-family: 'SF Mono','Fira Code', monospace; }
+</style>
+</head>
+<body class="figure">
+
+<h1>Data Layout</h1>
+<div class="sub">Logical index &rarr; physical address</div>
+
+<div class="wrap">
+  <div>
+    <div class="label">A[i, j]</div>
+    <div class="matrix-grid" id="matrix"></div>
+  </div>
+
+  <div class="arrow">
+    <svg width="60" height="32" viewBox="0 0 60 32">
+      <path d="M4 16h44M42 10l8 6-8 6" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </div>
+
+  <div>
+    <div class="label">1D Memory</div>
+    <div class="mem-strip" id="memstrip"></div>
+    <div class="mem-addrs" id="memaddrs"></div>
+  </div>
+</div>
+
+<script>
+const N = 4, TOTAL = N * N;
+function cellColor(idx) {
+  const t = idx / (TOTAL - 1);
+  return `hsl(215, ${55 + t * 20}%, ${80 - t * 48}%)`;
+}
+
+// Matrix - cells show flat index
+const matrix = document.getElementById('matrix');
+matrix.appendChild(Object.assign(document.createElement('div'), { className: 'hdr' }));
+for (let c = 0; c < N; c++) {
+  const h = document.createElement('div'); h.className = 'hdr'; h.textContent = c; matrix.appendChild(h);
+}
+for (let r = 0; r < N; r++) {
+  const rh = document.createElement('div'); rh.className = 'hdr'; rh.textContent = r; matrix.appendChild(rh);
+  for (let c = 0; c < N; c++) {
+    const idx = r * N + c;
+    const cell = document.createElement('div'); cell.className = 'm-cell';
+    cell.style.background = cellColor(idx);
+    cell.textContent = idx;
+    matrix.appendChild(cell);
+  }
+}
+
+// Memory strip - same value, same color
+const strip = document.getElementById('memstrip');
+const addrs = document.getElementById('memaddrs');
+for (let i = 0; i < TOTAL; i++) {
+  const mc = document.createElement('div'); mc.className = 'mem-cell';
+  mc.style.background = cellColor(i);
+  mc.textContent = i;
+  strip.appendChild(mc);
+
+  const a = document.createElement('div'); a.className = 'mem-addr';
+  a.textContent = `addr ${i}`;
+  addrs.appendChild(a);
+}
+</script>
+</body>
+</html>

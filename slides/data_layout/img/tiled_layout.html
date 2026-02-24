@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tiled Layout Derivation</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .wrap {
+    display: flex; align-items: flex-start; gap: 40px;
+    max-width: 1500px; margin: 20px auto 0; padding: 0 40px;
+  }
+  .left { flex: 1; }
+
+  .step {
+    display: flex; align-items: baseline; gap: 0;
+    margin-bottom: 6px;
+    font-family: 'SF Mono','Fira Code', monospace;
+    font-weight: 600;
+  }
+  .step-label {
+    font-size: 14px; font-weight: 700; color: var(--dim);
+    min-width: 180px; text-align: right; padding-right: 16px;
+    font-family: 'Inter','SF Pro', system-ui, sans-serif;
+  }
+
+  /* Aligned columns for tuple elements */
+  .cols { display: inline-flex; align-items: baseline; }
+  .col {
+    display: inline-flex; align-items: baseline; justify-content: center;
+    min-width: 70px; text-align: center; font-size: 22px;
+  }
+  .col-narrow { min-width: 20px; font-size: 22px; }
+  .col-wide { min-width: 90px; }
+
+  .s-shape { color: #3b82f6; }
+  .s-stride { color: #e85d04; }
+  .s-idx { color: #7c3aed; }
+  .s-plain { color: var(--text); }
+  .s-dim { color: var(--dim); font-size: 15px; }
+  .s-op { color: var(--text); font-size: 18px; }
+
+  /* Arrow between steps */
+  .arrow-row {
+    margin: 4px 0 4px 180px; padding-left: 16px;
+    color: var(--dim); font-size: 14px;
+    font-family: 'Inter','SF Pro', system-ui, sans-serif;
+  }
+
+  /* Vertical alignment lines */
+  .vlines {
+    margin: 0 0 0 196px;
+    height: 12px; display: flex;
+  }
+  .vl { min-width: 70px; display: flex; justify-content: center; }
+  .vl-line { width: 1px; height: 100%; background: var(--border); }
+
+  /* Result box */
+  .result-box {
+    background: #f0f7ff; border: 2px solid #3b82f6; border-radius: 8px;
+    padding: 12px 24px; margin-top: 10px; margin-left: 196px;
+    font-family: 'SF Mono','Fira Code', monospace;
+    font-size: 22px; font-weight: 700;
+  }
+
+  /* Matrix grid on right */
+  .right { padding-top: 10px; }
+  .right h3 {
+    font-size: 14px; font-weight: 700; color: var(--dim); text-align: center;
+    margin-bottom: 8px; font-family: 'Inter','SF Pro', system-ui, sans-serif;
+  }
+  .mgrid {
+    display: grid; gap: 2px;
+    position: relative;
+  }
+  .mc {
+    width: 34px; height: 34px; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; color: var(--dim);
+    font-family: 'SF Mono','Fira Code', monospace;
+    background: #eef0f4;
+  }
+  .mhdr {
+    font-size: 9px; color: var(--dim); font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'SF Mono','Fira Code', monospace;
+  }
+  /* Tile outlines via SVG overlay */
+  .mgrid-wrap { position: relative; display: inline-block; }
+  .tile-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body class="figure">
+
+<h1>Tiled Layout Derivation</h1>
+<div class="sub">S[(8, 8) : (8, 1)] → tile(2, 4)</div>
+
+<div class="wrap">
+<div class="left">
+  <!-- Row 1: Original shape -->
+  <div class="step">
+    <div class="step-label">Original shape</div>
+    <div class="cols">
+      <span class="col col-narrow s-plain">(</span>
+      <span class="col s-shape">8</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col">&nbsp;</span>
+      <span class="col col-narrow">&nbsp;</span>
+      <span class="col s-shape">8</span>
+      <span class="col col-narrow">&nbsp;</span>
+      <span class="col">&nbsp;</span>
+      <span class="col col-narrow s-plain">)</span>
+    </div>
+  </div>
+
+  <div class="arrow-row">↓ split by tile (2, 4)</div>
+
+  <!-- Row 2: Tiled shape — columns align with original -->
+  <div class="step">
+    <div class="step-label">Tiled shape</div>
+    <div class="cols">
+      <span class="col col-narrow s-plain">(</span>
+      <span class="col s-shape">4</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-shape">2</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-shape">2</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-shape">4</span>
+      <span class="col col-narrow s-plain">)</span>
+    </div>
+  </div>
+
+  <!-- Vertical alignment lines -->
+  <div class="vlines">
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+  </div>
+
+  <!-- Row 3: Indices from original i, j -->
+  <div class="step">
+    <div class="step-label">Indices</div>
+    <div class="cols">
+      <span class="col col-narrow s-plain">(</span>
+      <span class="col s-idx" style="font-size:16px">i//2</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-idx" style="font-size:16px">i%2</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-idx" style="font-size:16px">j//4</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-idx" style="font-size:16px">j%4</span>
+      <span class="col col-narrow s-plain">)</span>
+    </div>
+  </div>
+
+  <div class="arrow-row">↓ substitute into addr = i × 8 + j × 1</div>
+
+  <!-- Row 4: Strides with × operators aligned -->
+  <div class="step">
+    <div class="step-label">Strides</div>
+    <div class="cols">
+      <span class="col col-narrow s-plain">(</span>
+      <span class="col s-stride">16</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-stride">4</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-stride">8</span>
+      <span class="col col-narrow s-plain">,</span>
+      <span class="col s-stride">1</span>
+      <span class="col col-narrow s-plain">)</span>
+    </div>
+  </div>
+
+  <!-- Vertical alignment lines -->
+  <div class="vlines">
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+    <span class="vl"><span class="vl-line"></span></span>
+    <span class="col col-narrow"></span>
+  </div>
+
+  <!-- Row 5: addr formula with × between each pair -->
+  <div class="step">
+    <div class="step-label">addr =</div>
+    <div class="cols">
+      <span class="col col-narrow">&nbsp;</span>
+      <span class="col"><span class="s-idx">i<sub>o</sub></span><span class="s-op"> × </span><span class="s-stride">16</span></span>
+      <span class="col col-narrow s-plain">+</span>
+      <span class="col"><span class="s-idx">i<sub>i</sub></span><span class="s-op"> × </span><span class="s-stride">4</span></span>
+      <span class="col col-narrow s-plain">+</span>
+      <span class="col"><span class="s-idx">j<sub>o</sub></span><span class="s-op"> × </span><span class="s-stride">8</span></span>
+      <span class="col col-narrow s-plain">+</span>
+      <span class="col"><span class="s-idx">j<sub>i</sub></span><span class="s-op"> × </span><span class="s-stride">1</span></span>
+      <span class="col col-narrow">&nbsp;</span>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-box">
+    <span class="s-plain">S[(</span><span class="s-shape">4, 2, 2, 4</span><span class="s-plain">) : (</span><span class="s-stride">16, 4, 8, 1</span><span class="s-plain">)]</span>
+  </div>
+</div>
+
+<!-- Right: 8×8 matrix with tile outlines -->
+<div class="right">
+  <h3>8×8 matrix, tile(2, 4)</h3>
+  <div class="mgrid-wrap">
+    <div class="mgrid" id="mgrid"></div>
+    <svg class="tile-overlay" id="tile-ov"></svg>
+  </div>
+</div>
+</div>
+
+<script>
+const N = 8, TR = 2, TC = 4;
+const TILE_COLORS = ['#5b9bd5','#ed9a3c','#d95555','#45b5a5','#5fb85f','#e0b828','#9d6eb5','#e87888'];
+
+const mgrid = document.getElementById('mgrid');
+mgrid.style.gridTemplateColumns = '20px repeat(' + N + ', 34px)';
+
+// Corner + col headers
+mgrid.appendChild(Object.assign(document.createElement('div'), { className: 'mhdr' }));
+for (let c = 0; c < N; c++) {
+  const h = document.createElement('div'); h.className = 'mhdr'; h.textContent = c; mgrid.appendChild(h);
+}
+// Rows
+for (let r = 0; r < N; r++) {
+  const rl = document.createElement('div'); rl.className = 'mhdr'; rl.textContent = r; mgrid.appendChild(rl);
+  for (let c = 0; c < N; c++) {
+    const d = document.createElement('div'); d.className = 'mc';
+    d.textContent = r * N + c;
+    mgrid.appendChild(d);
+  }
+}
+
+// Draw tile outlines
+function drawTileOutlines() {
+  const svg = document.getElementById('tile-ov');
+  const wrap = svg.parentElement;
+  const wrapR = wrap.getBoundingClientRect();
+  svg.innerHTML = '';
+  svg.setAttribute('viewBox', '0 0 ' + wrapR.width + ' ' + wrapR.height);
+
+  const cells = mgrid.querySelectorAll('.mc');
+  const nTR = N / TR, nTC = N / TC;
+  for (let tr = 0; tr < nTR; tr++) {
+    for (let tc = 0; tc < nTC; tc++) {
+      // Top-left cell of this tile
+      const tl = cells[tr * TR * N + tc * TC];
+      // Bottom-right cell
+      const br = cells[(tr * TR + TR - 1) * N + (tc * TC + TC - 1)];
+      const tlR = tl.getBoundingClientRect();
+      const brR = br.getBoundingClientRect();
+      const x = tlR.left - wrapR.left - 1;
+      const y = tlR.top - wrapR.top - 1;
+      const w = brR.right - tlR.left + 2;
+      const h = brR.bottom - tlR.top + 2;
+      const color = TILE_COLORS[(tr * nTC + tc) % TILE_COLORS.length];
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', h);
+      rect.setAttribute('rx', '5');
+      rect.setAttribute('fill', 'none');
+      rect.setAttribute('stroke', color);
+      rect.setAttribute('stroke-width', '2.5');
+      svg.appendChild(rect);
+    }
+  }
+}
+window.addEventListener('load', drawTileOutlines);
+window.addEventListener('resize', drawTileOutlines);
+</script>
+</body>
+</html>

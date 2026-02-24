@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Data Layout: Sharding</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .wrap {
+    display: flex; align-items: center; justify-content: flex-start; gap: 40px;
+    max-width: 1500px; margin: 30px 0 0; padding: 0 24px 0 100px;
+  }
+  .label { font-size: 15px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 10px; }
+
+  /* Matrix */
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 24px repeat(4, 56px);
+    grid-template-rows: 24px repeat(4, 56px);
+    gap: 3px;
+  }
+  .hdr { font-size: 10px; color: var(--dim); font-weight: 600; display: flex; align-items: center; justify-content: center;
+    font-family: 'SF Mono','Fira Code', monospace; }
+  .m-cell {
+    border-radius: 5px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; font-family: 'SF Mono','Fira Code', monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+
+  /* Arrow */
+  .arrow { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .arrow-label { font-size: 12px; color: var(--dim); font-family: 'SF Mono','Fira Code', monospace; font-weight: 600;
+    text-align: center; line-height: 1.5; }
+
+  /* GPU boxes with flat memory */
+  .gpus { display: flex; flex-direction: column; gap: 14px; }
+  .gpu-box {
+    border: 2px solid var(--border); border-radius: 10px; padding: 10px 14px;
+  }
+  .gpu-label { font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 8px;
+    font-family: 'SF Mono','Fira Code', monospace; color: var(--text); }
+  .mem-strip { display: flex; gap: 2px; justify-content: center; }
+  .mem-cell {
+    width: 36px; height: 36px; border-radius: 5px; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; font-family: 'SF Mono','Fira Code', monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+  .mem-addrs { display: flex; gap: 2px; margin-top: 2px; justify-content: center; }
+  .mem-addr { width: 36px; text-align: center; font-size: 8px; color: var(--dim);
+    font-family: 'SF Mono','Fira Code', monospace; }
+</style>
+</head>
+<body class="figure">
+
+<h1>Data Layout: Sharding</h1>
+<div class="sub">Same notation, different axis &rarr; distributed across devices</div>
+
+<div class="wrap">
+  <div>
+    <div class="label">A[i, j]</div>
+    <div class="matrix-grid" id="matrix"></div>
+  </div>
+
+  <div class="arrow">
+    <svg width="80" height="40" viewBox="0 0 80 40">
+      <path d="M8 20h56M56 12l10 8-10 8" stroke="#888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <div class="arrow-label">shard by col<br>across 2 GPUs</div>
+  </div>
+
+  <div class="gpus">
+    <div class="gpu-box" id="gpu0box" style="border-color: hsl(215, 70%, 55%);">
+      <div class="gpu-label" style="color: hsl(215, 70%, 40%);">GPU 0 — cols 0-1</div>
+      <div class="mem-strip" id="gpu0strip"></div>
+      <div class="mem-addrs" id="gpu0addrs"></div>
+    </div>
+    <div class="gpu-box" id="gpu1box" style="border-color: hsl(25, 80%, 55%);">
+      <div class="gpu-label" style="color: hsl(25, 80%, 40%);">GPU 1 — cols 2-3</div>
+      <div class="mem-strip" id="gpu1strip"></div>
+      <div class="mem-addrs" id="gpu1addrs"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const N = 4, TOTAL = N * N;
+
+// GPU 0 = blue hue, GPU 1 = orange hue
+function gpuColor(gpuId, localIdx, localTotal) {
+  const t = localIdx / (localTotal - 1);
+  if (gpuId === 0) return `hsl(215, ${60 + t * 15}%, ${72 - t * 35}%)`;
+  return `hsl(25, ${65 + t * 15}%, ${75 - t * 35}%)`;
+}
+
+// Map matrix cell to GPU color
+function matrixColor(r, c) {
+  if (c < 2) return gpuColor(0, r * 2 + c, 8);
+  return gpuColor(1, r * 2 + (c - 2), 8);
+}
+
+// Build matrix — cells show flat index (0..15)
+const matrix = document.getElementById('matrix');
+matrix.appendChild(Object.assign(document.createElement('div'), { className: 'hdr' }));
+for (let c = 0; c < N; c++) {
+  const h = document.createElement('div'); h.className = 'hdr'; h.textContent = c; matrix.appendChild(h);
+}
+for (let r = 0; r < N; r++) {
+  const rh = document.createElement('div'); rh.className = 'hdr'; rh.textContent = r; matrix.appendChild(rh);
+  for (let c = 0; c < N; c++) {
+    const idx = r * N + c;
+    const cell = document.createElement('div'); cell.className = 'm-cell';
+    cell.style.background = matrixColor(r, c);
+    cell.textContent = idx;
+    matrix.appendChild(cell);
+  }
+}
+
+// Build GPU flat memory strips
+// GPU 0 gets cols 0-1, GPU 1 gets cols 2-3
+// Row-major within each shard
+function buildGpuStrip(stripEl, addrsEl, gpuId, colStart) {
+  let addr = 0;
+  for (let r = 0; r < N; r++) {
+    for (let ci = 0; ci < 2; ci++) {
+      const c = colStart + ci;
+      const idx = r * N + c;
+      const mc = document.createElement('div'); mc.className = 'mem-cell';
+      mc.style.background = gpuColor(gpuId, addr, 8);
+      mc.textContent = idx;
+      stripEl.appendChild(mc);
+
+      const a = document.createElement('div'); a.className = 'mem-addr';
+      a.textContent = `addr ${addr}`;
+      addrsEl.appendChild(a);
+      addr++;
+    }
+  }
+}
+buildGpuStrip(document.getElementById('gpu0strip'), document.getElementById('gpu0addrs'), 0, 0);
+buildGpuStrip(document.getElementById('gpu1strip'), document.getElementById('gpu1addrs'), 1, 2);
+</script>
+</body>
+</html>

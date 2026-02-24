@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Layouts</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<link rel="stylesheet" href="mlsyscourse.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title -->
+<section class="title-slide">
+  <p class="main-title">15-442/15-642: Machine Learning Systems</p>
+  <p class="lecture-title">Data Layouts</p>
+  <div class="info">
+    Spring 2026<br>
+    Tianqi Chen and Zhihao Jia<br>
+    Carnegie Mellon University
+  </div>
+</section>
+
+<!-- Outline -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li>Tiled & Thread Layout</li>
+    <li>Distributed Layout</li>
+    <li>Swizzle Layout</li>
+  </ul>
+</section>
+
+<!-- Outline: Tiled & Thread Layout -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li>Tiled & Thread Layout</li>
+    <li class="dim">Distributed Layout</li>
+    <li class="dim">Swizzle Layout</li>
+  </ul>
+</section>
+
+<!-- What is Data Layout -->
+<section>
+  <h2>What is Data Layout</h2>
+  <p>Mapping from logical indices to the phyiscal location of the data</p>
+  <div class="draw-wrap" style="height:200px;margin:0 auto">
+    <iframe src="img/why_layout_simple.html?notitle" width="1600" height="900" style="left:50%;transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+  <p>or different devices...</p>
+  <div class="draw-wrap" style="height:180px;margin:0 auto">
+    <iframe src="img/why_layout_sharding.html?notitle" width="1600" height="900" style="left:50%;transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Shape–Stride Model -->
+<section>
+  <h2>Shape&ndash;Stride Model</h2>
+  <p>We will use this notation:</p>
+  <div class="draw-wrap" style="height:900px;margin:0 auto">
+    <iframe src="img/shape_stride_notation.html?notitle" width="1600" height="900" style="left:50%;transform:translateX(-50%) scale(1);transform-origin:top center"></iframe>
+  </div>
+  <div class="footnote">This notation can be viewed as simplfied version of CuTe, with difference that we adopt row-major ordering.</div>
+</section>
+
+<!-- Tile Layout -->
+<section>
+  <h2>Tile Layout</h2>
+  <p>Representing tiling</p>
+  <div class="draw-wrap" style="height:900px;margin:0 auto">
+    <iframe src="img/example_tiled_layout.html?notitle" width="1600" height="900" style="left:50%;transform:translateX(-50%) scale(1);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Tile Layout: Interactive Example -->
+<section class="demo-slide">
+  <h2>Tile Layout: Interactive Example</h2>
+  <div class="iframe-wrap" style="height:660px">
+    <iframe src="demo/tiled_layout.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.6);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Named Axes in Strides -->
+<section>
+  <h2>Named Axes in Strides</h2>
+  <p>We need to represent different hardware axese:</p>
+  <ul>
+    <li>Lane and col dimension in tensor memory</li>
+    <li>Thread indcies</li>
+  </ul>
+  <p>It is useful to have named axes, we use <strong>@m</strong> for normal meory</p>
+  <ul>
+    <li><code>Row-major 8&times;16:   S[(8, 16) : (16@m, 1@m)]</code></li>
+  </ul>
+  <p>The <code>@axis</code> tag can also be other things like <code>@warpid</code>, or <code>@tmemcol</code></p>
+</section>
+
+<!-- Demo: Named Axes Example: Thread + Register -->
+<section class="demo-slide">
+  <h2>Named Axes Example: Thread + Register</h2>
+  <div class="iframe-wrap" style="height:660px">
+    <iframe src="demo/thread_register.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.6);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Distributed Layout -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Tiled & Thread Layout</li>
+    <li>Distributed Layout</li>
+    <li class="dim">Swizzle Layout</li>
+  </ul>
+</section>
+
+<!-- Distributed Axes: @gpuid_y, @gpuid_x -->
+<section>
+  <h2>Distributed Axes: @gpuid_y, @gpuid_x</h2>
+  <p>Representing broadcast / replication</p>
+  <div class="draw-wrap" style="height:540px;margin:0 auto">
+    <iframe src="img/example_replica_layout.html?notitle" width="1600" height="900" style="left:50%;transform:translateX(-50%) scale(0.6);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Distributed Axes: Interactive -->
+<section class="demo-slide">
+  <h2>Distributed Axes: Interactive</h2>
+  <div class="iframe-wrap" style="height:660px">
+    <iframe src="demo/tile_distributed.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.6);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Swizzle Layout -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Tiled & Thread Layout</li>
+    <li class="dim">Distributed Layout</li>
+    <li>Swizzle Layout</li>
+  </ul>
+</section>
+
+<!-- Background: Memory Banks -->
+<section>
+  <h2>Background: Memory Banks</h2>
+  <p>Different memory banks can be read out in parallel</p>
+  <div class="draw-wrap" style="height:540px">
+    <iframe src="img/bank_conflict.html?notitle" width="1600" height="900" style="left:50%;transform:translateX(-50%) scale(0.6);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Simple Swizzle: 8×8 Interactive Example -->
+<section class="demo-slide">
+  <h2>Simple Swizzle: 8&times;8 Interactive Example</h2>
+  <div class="iframe-wrap" style="height:550px">
+    <iframe src="demo/swizzle_8x8.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Real Example: SWIZZLE_128B -->
+<section class="demo-slide">
+  <h2>Real Example: SWIZZLE_128B</h2>
+  <div class="iframe-wrap">
+    <iframe src="demo/swizzle_128B.html?embed" width="1600" height="1100"></iframe>
+  </div>
+</section>
+
+<!-- Swizzle as a Memory Optimization -->
+<section>
+  <h2>Swizzle as a Memory Optimization</h2>
+  <p><strong>Swizzle is an implicit remapping the hardware applies &mdash; just enable it</strong></p>
+  <ul>
+    <li>Pass pre-swizzled addresses and use a consistent swizzle mode (e.g. SWIZZLE_128B) across ops</li>
+    <li>Don't worry about swizzle yourself &mdash; let hardware handles it.</li>
+    <li>Benefit: SWIZZLE_128B &rarr; conflict-free access to 8 rows and 8 columns at a time (fp16)</li>
+  </ul>
+  <p>Swizzle is fundamentally a way to enable efficient column access &mdash; the idea is not specific to GPU shared memory!</p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    width: 1200,
+    height: 700,
+    margin: 0,
+    center: false,
+    transition: 'slide',
+  });
+  // Forward arrow keys from embedded iframes to Reveal
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'revealKey') {
+      var ev = new KeyboardEvent('keydown', { keyCode: e.data.keyCode, bubbles: true });
+      document.dispatchEvent(ev);
+    }
+  });
+</script>
+</body>
+</html>

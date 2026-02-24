@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>What is Data Layout</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .wrap { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 32px; padding-top: 20px; }
+
+  /* 4x4 logical matrix */
+  .matrix-section h2, .memory-section h2 {
+    text-align: center; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px;
+  }
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 28px repeat(4, 64px);
+    grid-template-rows: 28px repeat(4, 64px);
+    gap: 3px;
+  }
+  .hdr { font-size: 11px; color: var(--dim); font-weight: 600; display: flex; align-items: center; justify-content: center;
+    font-family: 'SF Mono','Fira Code', monospace; }
+  .m-cell {
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; font-family: 'SF Mono','Fira Code', monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+
+  /* Arrow between matrix and memory */
+  .arrow-section {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    color: var(--dim); font-size: 13px; font-family: 'SF Mono','Fira Code', monospace; font-weight: 600;
+  }
+
+  /* Flat memory strip */
+  .mem-strip {
+    display: grid;
+    grid-template-columns: repeat(16, 48px);
+    gap: 2px;
+  }
+  .mem-cell {
+    height: 44px; border-radius: 5px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; font-family: 'SF Mono','Fira Code', monospace;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+  .mem-labels {
+    display: grid; grid-template-columns: repeat(16, 48px); gap: 2px; margin-top: 2px;
+  }
+  .mem-lbl {
+    font-size: 9px; color: var(--dim); text-align: center;
+    font-family: 'SF Mono','Fira Code', monospace; font-weight: 600;
+  }
+</style>
+</head>
+<body class="figure">
+
+<h1>What is Data Layout</h1>
+<div class="sub">Mapping from logical indices to physical memory location</div>
+
+<div class="wrap">
+
+  <div class="matrix-section">
+    <h2>Logical 4 &times; 4 Matrix &mdash; A[row, col]</h2>
+    <div class="matrix-grid" id="matrix"></div>
+  </div>
+
+  <div class="arrow-section">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 4v14M7 13l5 5 5-5" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    addr = row &times; 4 + col
+  </div>
+
+  <div class="memory-section">
+    <h2>Physical 1D Memory</h2>
+    <div class="mem-strip" id="memstrip"></div>
+    <div class="mem-labels" id="memlabels"></div>
+  </div>
+
+</div>
+
+<script>
+const N = 4;
+const TOTAL = N * N;
+
+// Color for flat index
+function cellColor(idx) {
+  const t = idx / (TOTAL - 1);
+  const l = 82 - t * 52;   // 82% -> 30%
+  const s = 55 + t * 20;   // 55% -> 75%
+  return `hsl(215, ${s}%, ${l}%)`;
+}
+
+// Build logical matrix
+const matrix = document.getElementById('matrix');
+// Corner
+matrix.appendChild(Object.assign(document.createElement('div'), { className: 'hdr' }));
+// Col headers
+for (let c = 0; c < N; c++) {
+  const h = document.createElement('div');
+  h.className = 'hdr';
+  h.textContent = `col ${c}`;
+  matrix.appendChild(h);
+}
+// Rows
+for (let r = 0; r < N; r++) {
+  const rh = document.createElement('div');
+  rh.className = 'hdr';
+  rh.textContent = `row ${r}`;
+  matrix.appendChild(rh);
+  for (let c = 0; c < N; c++) {
+    const idx = r * N + c;
+    const cell = document.createElement('div');
+    cell.className = 'm-cell';
+    cell.style.background = cellColor(idx);
+    cell.textContent = idx;
+    matrix.appendChild(cell);
+  }
+}
+
+// Build flat memory strip
+const strip = document.getElementById('memstrip');
+const labels = document.getElementById('memlabels');
+for (let i = 0; i < TOTAL; i++) {
+  const mc = document.createElement('div');
+  mc.className = 'mem-cell';
+  mc.style.background = cellColor(i);
+  mc.textContent = i;
+  strip.appendChild(mc);
+
+  const lb = document.createElement('div');
+  lb.className = 'mem-lbl';
+  lb.textContent = `[${Math.floor(i/N)},${i%N}]`;
+  labels.appendChild(lb);
+}
+</script>
+
+</body>
+</html>
