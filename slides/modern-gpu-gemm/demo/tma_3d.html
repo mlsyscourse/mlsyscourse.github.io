@@ -71,8 +71,6 @@
       <button class="btn on" data-v="128">128B</button>
     </div>
   </div>
-  <div><span class="lbl">Group</span><div class="bg" id="gc"></div></div>
-  <div><span class="lbl">Row offset</span><div class="bg" id="rc"></div></div>
   <div><span class="lbl">Col offset</span><div class="bg" id="cc"></div></div>
 </div>
 
@@ -117,30 +115,25 @@ var GRP_BYTES = 128;   // 64 fp16 × 2B per group
 var GCSZ = 10;         // global cell size
 var SCSZ = 12;         // shared cell size
 
-var ST = { sw: '128', group: -1, row: -1, col: 0, hovR: -1, hovC: -1, hovGi: 0 };
+var ST = { sw: '128', col: 0, hovR: -1, hovC: -1, hovGi: 0 };
 
 function mk(t, c) { var d = document.createElement(t); if (c) d.className = c; return d; }
 
 function draw() {
   var useSw = ST.sw === '128';
-  var allGroups = (ST.group === -1);
-  var allRows = (ST.row === -1);
   var colOff = ST.col;                          // which pair of groups (0 or 1)
-  var selG = allGroups ? 0 : ST.group;          // group within the pair (0 or 1)
-  var globalG = colOff * NGROUPS + selG;        // absolute group index (0-3)
-  var selR = allRows ? 0 : ST.row * BOX_R;
-  var boxGrp = allGroups ? 2 : 1;
-  var boxRows = allRows ? GDR : BOX_R;
+  var boxGrp = NGROUPS;                         // always all groups
+  var boxRows = GDR;                            // always all 16 rows
 
   // Box in global: contiguous rectangle
   var colBase = colOff * NGROUPS * GSECS;       // sector offset for col
-  var boxColStart = colBase + (allGroups ? 0 : selG * GSECS);
-  var boxColEnd = colBase + (allGroups ? NGROUPS * GSECS : (selG + 1) * GSECS);
+  var boxColStart = colBase;
+  var boxColEnd = colBase + NGROUPS * GSECS;
 
   // TMA info
-  var globalGStart = colOff * NGROUPS + (allGroups ? 0 : selG);
+  var globalGStart = colOff * NGROUPS;
   document.getElementById('tmainfo').innerHTML =
-    'cp.async.bulk.tensor.3d<br>(row=' + selR + ', group=' + globalGStart + ', col=0)' +
+    'cp.async.bulk.tensor.3d<br>(row=0, group=' + globalGStart + ', col=0)' +
     (useSw ? '<br>+ SWIZZLE_128B' : '');
 
 
@@ -149,14 +142,12 @@ function draw() {
   document.getElementById('infobox').innerHTML =
     '<b>TensorMap</b>: <span class="formula">' +
     'dtype = f16, globalDim = [64, 16, ' + TOTAL_GROUPS + '], globalStrides = [512B, 128B], ' +
-    'boxDim = [64, ' + boxRows + ', ' + boxGrp + '], swizzle = ' + swName + '</span><br>' +
+    'boxDim = [64, 16, 2], swizzle = ' + swName + '</span><br>' +
     '<b>Instruction</b>: <span class="formula">cp.async.bulk.tensor.3d.shared::cta.global.mbarrier::complete_tx::bytes [smem], [tensormap, {' +
-    '0, ' + selR + ', ' + globalGStart + '}], [mbar]</span><br>' +
-    (boxGrp > 1
-      ? '<b>Key idea</b>: <span class="formula">Let gslice be the ' + boxRows + '\u00d7128 f16 matrix slice \u2192 ' +
-        'gslice.reshape(' + boxRows + ', 2, 64).transpose(1, 0, 2)' +
-        ' has shape (2, ' + boxRows + ', 64) \u2192 matches contiguous view of shared memory</span><br>'
-      : '') +
+    '0, 0, ' + globalGStart + '}], [mbar]</span><br>' +
+    '<b>Key idea</b>: <span class="formula">Let gslice be the 16\u00d7128 f16 matrix slice \u2192 ' +
+        'gslice.reshape(16, 2, 64).transpose(1, 0, 2)' +
+        ' has shape (2, 16, 64) \u2192 matches contiguous view of shared memory</span><br>' +
     '<b>Note</b>: TensorMap and PTX follows column-major per official spec \u2014 globalDim, globalStrides, boxDim, and copy instruction coordinates are reversed from row-major order.';
 
   // Global memory: single contiguous grid
@@ -168,11 +159,11 @@ function draw() {
       var d = mk('div', 'gc');
       d.style.width = GCSZ + 'px';
       d.style.height = GCSZ + 'px';
-      var inBox = (r >= selR && r < selR + boxRows && c >= boxColStart && c < boxColEnd);
+      var inBox = (c >= boxColStart && c < boxColEnd);
       if (inBox) {
         d.classList.add('inbox');
         var cellGi = Math.floor((c - colBase) / GSECS);
-        var lr = r - selR;
+        var lr = r;
         var lc = c - colBase - cellGi * GSECS;
         d.dataset.lr = lr;
         d.dataset.lc = lc;
@@ -222,13 +213,13 @@ function draw() {
         d.textContent = logCol;
 
         // Is this cell in the TMA box?
-        var inBox = ((allGroups || gi === selG) && r >= selR && r < selR + boxRows);
+        var inBox = true;  // always all groups, all rows
         if (inBox) {
           d.classList.add('rd');
           // Mark hover target
           if (ST.hovR >= 0 && gi === ST.hovGi) {
             var destSec = useSw ? (ST.hovC ^ (ST.hovR % 8)) : ST.hovC;
-            if ((r - selR) === ST.hovR && p === destSec) {
+            if (r === ST.hovR && p === destSec) {
               d.id = 'shov';
             }
           }
@@ -320,38 +311,6 @@ function drawArrow() {
     ST.hovR = -1; ST.hovC = -1;
     draw();
   };
-
-  // Group buttons: All, 0, 1
-  var gc = document.getElementById('gc');
-  var grpChoices = [{v:-1,t:'All'},{v:0,t:'0'},{v:1,t:'1'}];
-  for (var i = 0; i < grpChoices.length; i++) {
-    var b = mk('button', 'btn' + (i === 0 ? ' on' : ''));
-    b.textContent = grpChoices[i].t;
-    b.onclick = (function(v) { return function() {
-      ST.group = v;
-      gc.querySelectorAll('.btn').forEach(function(x) { x.classList.remove('on'); });
-      this.classList.add('on');
-      ST.hovR = -1; ST.hovC = -1;
-      draw();
-    }; })(grpChoices[i].v);
-    gc.appendChild(b);
-  }
-
-  // Row offset buttons: All, 0, 8
-  var rc = document.getElementById('rc');
-  var rowChoices = [{v:-1,t:'All'},{v:0,t:'0'},{v:1,t:'8'}];
-  for (var i = 0; i < rowChoices.length; i++) {
-    var b = mk('button', 'btn' + (i === 0 ? ' on' : ''));
-    b.textContent = rowChoices[i].t;
-    b.onclick = (function(v) { return function() {
-      ST.row = v;
-      rc.querySelectorAll('.btn').forEach(function(x) { x.classList.remove('on'); });
-      this.classList.add('on');
-      ST.hovR = -1; ST.hovC = -1;
-      draw();
-    }; })(rowChoices[i].v);
-    rc.appendChild(b);
-  }
 
   // Col offset buttons: 0, 128
   var cc = document.getElementById('cc');
