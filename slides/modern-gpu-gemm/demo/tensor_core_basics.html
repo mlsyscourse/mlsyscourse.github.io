@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tensor Core Basics</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .main { display:flex; gap:24px; max-width:1200px; margin:0 auto; justify-content:center; align-items:flex-start; flex-wrap:wrap; }
+  .mat-box { background:var(--surface); border-radius:10px; padding:14px; border:1px solid var(--border);
+    box-shadow:0 1px 3px rgba(0,0,0,.06); text-align:center; }
+  .mat-box h2 { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .mat-box .dims { font-size:11px; color:var(--dim); margin-bottom:8px; font-weight:600; }
+
+  .grid { display:grid; gap:1px; margin:0 auto; }
+  .cell {
+    width:40px; height:40px; border-radius:4px; display:flex; align-items:center; justify-content:center;
+    font-size:9px; font-weight:700; border:2px solid transparent; transition:all .15s;
+    cursor:pointer; color:#fff; text-shadow:0 1px 1px rgba(0,0,0,.2);
+  }
+  .cell.idle { background:var(--color-cell-bg); color:var(--text); text-shadow:none; }
+  .cell.active { border-color:#222; border-width:2.5px; z-index:1; }
+  .cell.dim { opacity:.2; }
+
+  .op { font-size:24px; display:flex; align-items:center; justify-content:center; color:var(--dim);
+    font-weight:700; padding:0 8px; align-self:center; }
+  .eq { font-size:18px; display:flex; align-items:center; justify-content:center; color:var(--dim);
+    font-weight:700; padding:0 6px; align-self:center; }
+
+  .anim-bar { max-width:1200px; margin:18px auto 0; display:flex; gap:8px; justify-content:center; align-items:center; }
+  #kbar { display:flex; gap:2px; }
+  .anim-bar .lbl { font-size:12px; color:var(--dim); font-weight:600; }
+  .kb { width:36px; height:30px; border:1px solid var(--border); background:var(--surface); color:var(--text);
+    cursor:pointer; border-radius:0; font-size:12px; font-family:inherit; display:flex; align-items:center;
+    justify-content:center; transition:all .12s; font-weight:600; }
+  .kb:hover { background:#eef0f4; }
+  .kb.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .kb.done { background:#93c5fd; border-color:#93c5fd; color:#fff; }
+
+  .info { max-width:1200px; margin:14px auto 0; text-align:center; font-size:13px; color:var(--dim); font-weight:600; }
+
+  .formula-box { max-width:1200px; margin:12px auto 0; background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:10px 16px; text-align:center; font-size:14px;
+    font-family:'SF Mono','Fira Code',monospace; color:var(--accent); font-weight:600; }
+
+  .leg { gap:0; margin-top:14px; }
+</style>
+</head>
+<body>
+
+<h1>Tensor Core: GEMM at Block Level</h1>
+
+<div class="controls">
+  <div><span class="lbl">Transpose A</span>
+    <div class="bg" id="ta">
+      <button class="btn on" data-v="0">No</button>
+      <button class="btn" data-v="1">Yes</button>
+    </div>
+  </div>
+  <div><span class="lbl">Transpose B</span>
+    <div class="bg" id="tb">
+      <button class="btn on" data-v="0">No</button>
+      <button class="btn" data-v="1">Yes</button>
+    </div>
+  </div>
+</div>
+<div class="sub" id="subtitle">C(N&times;M) += A(N&times;K) &times; B(K&times;M) &nbsp;|&nbsp; Each cell = 16&times;16 fp16 block</div>
+<div class="controls">
+  <div><span class="lbl">N-slice (row of C)</span>
+    <div class="bg" id="ns"></div>
+  </div>
+  <div><span class="lbl">M-slice (col of C)</span>
+    <div class="bg" id="ms"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="mat-box">
+    <h2 style="color:var(--color-group-0)" id="ah">A</h2>
+    <div class="dims" id="ad"></div>
+    <div class="grid" id="ga"></div>
+  </div>
+  <div class="op">&times;</div>
+  <div class="mat-box">
+    <h2 style="color:var(--color-group-1)" id="bh">B</h2>
+    <div class="dims" id="bd"></div>
+    <div class="grid" id="gb"></div>
+  </div>
+  <div class="eq">&rarr;</div>
+  <div class="mat-box">
+    <h2 style="color:var(--color-group-4)">C</h2>
+    <div class="dims" id="cd"></div>
+    <div class="grid" id="gc"></div>
+  </div>
+</div>
+
+<div class="anim-bar">
+  <span class="lbl">K iteration:</span>
+  <div id="kbar"></div>
+</div>
+
+<div class="formula-box" id="fbox"></div>
+<div class="info" id="inf"></div>
+
+<script>
+const BK = ['#5b9bd5','#ed9a3c','#d95555','#45b5a5','#5fb85f','#e0b828','#9d6eb5','#e87888'];
+const GRID = 4; // 4x4 blocks = 64x64
+const ST = { n: 0, m: 0, k: -1, tA: false, tB: false, playing: false, timer: null };
+
+function draw() {
+  const K = GRID;
+  const tA = ST.tA, tB = ST.tB;
+
+  // Subtitle
+  const sub = document.getElementById('subtitle');
+  const aShape = tA ? 'A\u1d40(K\u00d7N)' : 'A(N\u00d7K)';
+  const bShape = tB ? 'B\u1d40(M\u00d7K)' : 'B(K\u00d7M)';
+  sub.innerHTML = 'C(N\u00d7M) += ' + aShape + ' \u00d7 ' + bShape + ' &nbsp;|&nbsp; Each cell = 16\u00d716 fp16 block';
+
+  // Headers
+  document.getElementById('ah').textContent = tA ? 'A\u1d40' : 'A';
+  document.getElementById('bh').textContent = tB ? 'B\u1d40' : 'B';
+
+  // A dimensions: normal = N×K, transposed = K×N
+  const aRows = tA ? GRID : GRID;
+  const aCols = tA ? GRID : GRID;
+  const aRLabel = tA ? 'K' : 'N';
+  const aCLabel = tA ? 'N' : 'K';
+  document.getElementById('ad').textContent = (aRows * 16) + '\u00d7' + (aCols * 16) + ' (rows=' + aRLabel + ', cols=' + aCLabel + ')';
+
+  // B dimensions: normal = K×M, transposed = M×K
+  const bRows = tB ? GRID : GRID;
+  const bCols = tB ? GRID : GRID;
+  const bRLabel = tB ? 'M' : 'K';
+  const bCLabel = tB ? 'K' : 'M';
+  document.getElementById('bd').textContent = (bRows * 16) + '\u00d7' + (bCols * 16) + ' (rows=' + bRLabel + ', cols=' + bCLabel + ')';
+
+  document.getElementById('cd').textContent = (GRID * 16) + '\u00d7' + (GRID * 16) + ' (rows=N, cols=M)';
+
+  // Matrix A
+  const ga = document.getElementById('ga'); ga.innerHTML = '';
+  ga.style.gridTemplateColumns = 'repeat(' + aCols + ', 40px)';
+  for (let r = 0; r < aRows; r++) {
+    for (let c = 0; c < aCols; c++) {
+      const d = mk('div', 'cell');
+      // Logical indices: which N and K does this cell represent?
+      const cellN = tA ? c : r;
+      const cellK = tA ? r : c;
+      if (cellN === ST.n) {
+        if (ST.k >= 0 && cellK === ST.k) { d.style.background = BK[0]; d.classList.add('active'); }
+        else if (ST.k >= 0 && cellK < ST.k) { d.style.background = BK[0]; d.style.opacity = '.4'; }
+        else if (ST.k < 0) { d.style.background = BK[0]; d.classList.add('active'); }
+        else { d.classList.add('idle', 'dim'); }
+      } else {
+        d.classList.add('idle', 'dim');
+      }
+      ga.appendChild(d);
+    }
+  }
+
+  // Matrix B
+  const gb = document.getElementById('gb'); gb.innerHTML = '';
+  gb.style.gridTemplateColumns = 'repeat(' + bCols + ', 40px)';
+  for (let r = 0; r < bRows; r++) {
+    for (let c = 0; c < bCols; c++) {
+      const d = mk('div', 'cell');
+      const cellK = tB ? c : r;
+      const cellM = tB ? r : c;
+      if (cellM === ST.m) {
+        if (ST.k >= 0 && cellK === ST.k) { d.style.background = BK[1]; d.classList.add('active'); }
+        else if (ST.k >= 0 && cellK < ST.k) { d.style.background = BK[1]; d.style.opacity = '.4'; }
+        else if (ST.k < 0) { d.style.background = BK[1]; d.classList.add('active'); }
+        else { d.classList.add('idle', 'dim'); }
+      } else {
+        d.classList.add('idle', 'dim');
+      }
+      gb.appendChild(d);
+    }
+  }
+
+  // Matrix C: N rows, M cols (always)
+  const gc = document.getElementById('gc'); gc.innerHTML = '';
+  gc.style.gridTemplateColumns = 'repeat(' + GRID + ', 40px)';
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c < GRID; c++) {
+      const d = mk('div', 'cell');
+      if (r === ST.n && c === ST.m) {
+        d.style.background = BK[4]; d.classList.add('active');
+      } else {
+        d.classList.add('idle', 'dim');
+      }
+      gc.appendChild(d);
+    }
+  }
+
+  // K bar
+  const kbar = document.getElementById('kbar'); kbar.innerHTML = '';
+  // Play button first
+  const pb = mk('button', 'kb'); pb.style.width = '36px'; pb.style.fontSize = '16px';
+  pb.innerHTML = '&#x25b7;';
+  pb.onclick = () => {
+    if (ST.playing) { clearInterval(ST.timer); ST.playing = false; draw(); return; }
+    ST.k = 0; ST.playing = true; draw();
+    ST.timer = setInterval(() => {
+      ST.k++;
+      if (ST.k >= GRID) { ST.k = -1; ST.playing = false; clearInterval(ST.timer); }
+      draw();
+    }, 800);
+  };
+  kbar.appendChild(pb);
+  const allBtn = mk('button', 'kb' + (ST.k < 0 ? ' on' : '')); allBtn.textContent = 'All';
+  allBtn.onclick = () => { ST.k = -1; draw(); };
+  kbar.appendChild(allBtn);
+  for (let i = 0; i < K; i++) {
+    const b = mk('button', 'kb');
+    if (ST.k === i) b.classList.add('on');
+    else if (ST.k > i) b.classList.add('done');
+    b.textContent = 'k=' + i;
+    b.onclick = (v => () => { ST.k = v; draw(); })(i);
+    kbar.appendChild(b);
+  }
+
+  // Formula
+  const fbox = document.getElementById('fbox');
+  const aRef = tA ? 'A\u1d40[k, n]' : 'A[n, k]';
+  const bRef = tB ? 'B\u1d40[m, k]' : 'B[k, m]';
+  fbox.textContent = 'C[n, m] += ' + aRef + ' \u00d7 ' + bRef + ', for k = 0 .. K-1';
+
+  // Info
+  const inf = document.getElementById('inf');
+  const aIdx = tA ? '[' + ST.k + ',' + ST.n + ']' : '[' + ST.n + ',' + ST.k + ']';
+  const bIdx = tB ? '[' + ST.m + ',' + ST.k + ']' : '[' + ST.k + ',' + ST.m + ']';
+  const aName = tA ? 'A\u1d40' : 'A';
+  const bName = tB ? 'B\u1d40' : 'B';
+  if (ST.k < 0) {
+    inf.textContent = 'C[' + ST.n + ',' + ST.m + '] = sum over k of ' + aName + '[' + ST.n + ',k] \u00d7 ' + bName + '[k,' + ST.m + ']';
+  } else {
+    inf.textContent = 'K step ' + ST.k + ': C[' + ST.n + ',' + ST.m + '] += ' + aName + aIdx + ' \u00d7 ' + bName + bIdx;
+  }
+}
+
+function mk(t, c) { const d = document.createElement(t); if (c) d.className = c; return d; }
+
+(function init() {
+  // N-slice buttons
+  const ns = document.getElementById('ns');
+  for (let i = 0; i < GRID; i++) {
+    const b = mk('button', 'btn' + (i === 0 ? ' on' : '')); b.textContent = i;
+    b.onclick = (v => () => { ST.n = v; ns.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
+    ns.appendChild(b);
+  }
+  // M-slice buttons
+  const ms = document.getElementById('ms');
+  for (let i = 0; i < GRID; i++) {
+    const b = mk('button', 'btn' + (i === 0 ? ' on' : '')); b.textContent = i;
+    b.onclick = (v => () => { ST.m = v; ms.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
+    ms.appendChild(b);
+  }
+  // Transpose A
+  document.getElementById('ta').onclick = e => {
+    const b = e.target.closest('.btn'); if (!b) return;
+    ST.tA = b.dataset.v === '1';
+    document.querySelectorAll('#ta .btn').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    draw();
+  };
+  // Transpose B
+  document.getElementById('tb').onclick = e => {
+    const b = e.target.closest('.btn'); if (!b) return;
+    ST.tB = b.dataset.v === '1';
+    document.querySelectorAll('#tb .btn').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    draw();
+  };
+  draw();
+})();
+</script>
+</body>
+</html>

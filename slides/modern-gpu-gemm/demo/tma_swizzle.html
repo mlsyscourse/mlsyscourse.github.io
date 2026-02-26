@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TMA with Swizzle</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .main { display:flex; gap:20px; max-width:1200px; margin:0 auto; align-items:center; justify-content:center; }
+  .mat-box { background:var(--surface); border-radius:10px; padding:14px; border:1px solid var(--border);
+    box-shadow:0 1px 3px rgba(0,0,0,.06); text-align:center; }
+  .mat-box h2 { font-size:14px; font-weight:700; margin-bottom:2px; }
+  .mat-box .dims { font-size:11px; color:var(--dim); margin-bottom:6px; font-weight:600; }
+
+  .grid { display:inline-grid; gap:1px; }
+  .cell {
+    border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:7px; font-weight:700; border:2px solid transparent; transition:all .12s;
+    min-width:0;
+  }
+  .cell.global { background:var(--color-cell-bg); color:var(--text); }
+  .cell.active { border-color:var(--accent); background:var(--color-hover-bg); color:var(--color-hover-text); }
+  .cell.smem { color:#fff; text-shadow:0 1px 1px rgba(0,0,0,.2); }
+  .cell.dim { opacity:.15; }
+
+  .arrow-box { display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 12px; }
+  .arrow-box .arrow { font-size:32px; color:var(--accent); }
+  .arrow-box .label { font-size:13px; font-weight:700; color:var(--accent); }
+  .arrow-box .detail { font-size:10px; color:var(--dim); font-weight:600; text-align:center; }
+
+  .info { max-width:1200px; margin:14px auto 0; background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:10px 16px; font-size:13px; line-height:1.6; }
+  .info b { font-weight:700; }
+  .info .formula { font-family:'SF Mono','Fira Code',monospace; color:var(--accent); font-weight:600; }
+
+  .leg { gap:0; margin-top:12px; }
+</style>
+</head>
+<body>
+
+<h1>TMA with Swizzle Option</h1>
+<div class="sub">TMA applies swizzle during copy &mdash; data arrives pre-swizzled in shared memory</div>
+
+<div class="controls">
+  <div><span class="lbl">Swizzle</span>
+    <div class="bg" id="sw">
+      <button class="btn" data-v="none">None</button>
+      <button class="btn on" data-v="128">128B</button>
+    </div>
+  </div>
+  <div><span class="lbl">Row offset</span><div class="bg" id="rc"></div></div>
+</div>
+
+<div class="main">
+  <div class="mat-box">
+    <h2 style="color:var(--color-group-2)">Global Memory</h2>
+    <div class="dims">32&times;64 fp16 (logical, row-major)</div>
+    <div class="grid" id="gg"></div>
+  </div>
+
+  <div class="arrow-box">
+    <div class="arrow">&rarr;</div>
+    <div class="label">TMA</div>
+    <div class="detail" id="tmainfo">+ SWIZZLE_128B</div>
+  </div>
+
+  <div class="mat-box">
+    <h2 style="color:var(--color-group-4)">Shared Memory</h2>
+    <div class="dims" id="sdims">8&times;64 fp16 (swizzled)</div>
+    <div class="grid" id="gs"></div>
+  </div>
+</div>
+
+<div class="info">
+  <b>Key insight</b>: TMA has a <span class="formula">swizzle_mode</span> field in the tensor map descriptor.<br>
+  When set to SWIZZLE_128B, the hardware applies <span class="formula">sector_col = logical_col XOR row</span> during the copy.<br>
+  Result: data arrives in shared memory already conflict-free for 8&times;8 column reads.<br>
+  <b>No software swizzle needed</b> &mdash; just configure TMA and read naturally.
+</div>
+
+<script>
+const BK = ['#5b9bd5','#ed9a3c','#d95555','#45b5a5','#5fb85f','#e0b828','#9d6eb5','#e87888'];
+const GROWS = 32, GCOLS = 64; // fp16 elements
+const BOX_R = 8, BOX_C = 64;
+// Display: each cell = 8 fp16 = 1 sector (16 bytes)
+const GCELL = 8; // elements per display cell
+const GDR = GROWS, GDC = GCOLS / GCELL; // 32 rows x 8 sector-cols for global
+const SDR = BOX_R, SDC = BOX_C / GCELL; // 8 rows x 8 sector-cols for shared
+
+const ST = { sw: '128', row: 0 };
+
+function draw() {
+  const useSw = ST.sw === '128';
+
+  document.getElementById('tmainfo').textContent = useSw ? '+ SWIZZLE_128B' : 'No swizzle';
+  document.getElementById('sdims').textContent = BOX_R + '\u00d7' + BOX_C + ' fp16 (' + (useSw ? 'swizzled' : 'linear') + ')';
+
+  // Global memory (shown as sector-level: 32 rows x 8 sector-columns)
+  const gg = document.getElementById('gg'); gg.innerHTML = '';
+  gg.style.gridTemplateColumns = 'repeat(' + GDC + ', 28px)';
+  for (let r = 0; r < GDR; r++) {
+    for (let c = 0; c < GDC; c++) {
+      const d = mk('div', 'cell');
+      d.style.width = '28px'; d.style.height = '14px';
+      const inBox = (r >= ST.row && r < ST.row + SDR);
+      if (inBox) {
+        d.classList.add('active');
+      } else {
+        d.classList.add('global', 'dim');
+      }
+      gg.appendChild(d);
+    }
+  }
+
+  // Shared memory (8 rows x 8 sector-columns, with optional swizzle coloring)
+  const gs = document.getElementById('gs'); gs.innerHTML = '';
+  gs.style.gridTemplateColumns = 'repeat(' + SDC + ', 36px)';
+  for (let r = 0; r < SDR; r++) {
+    for (let c = 0; c < SDC; c++) {
+      const d = mk('div', 'cell smem');
+      d.style.width = '36px'; d.style.height = '36px';
+      // With swizzle: physical sector = c ^ r
+      const physSec = useSw ? (c ^ r) : c;
+      d.style.background = BK[physSec % 8];
+      // Show logical column
+      const logCol = useSw ? (c ^ r) : c; // this is where it physically lands
+      d.textContent = c; // always show logical column index
+      gs.appendChild(d);
+    }
+  }
+}
+
+function mk(t, c) { const d = document.createElement(t); if (c) d.className = c; return d; }
+
+(function init() {
+  document.getElementById('sw').onclick = e => {
+    const b = e.target.closest('.btn'); if (!b) return;
+    ST.sw = b.dataset.v;
+    document.querySelectorAll('#sw .btn').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    draw();
+  };
+  const rc = document.getElementById('rc');
+  for (let i = 0; i <= GROWS - BOX_R; i += 8) {
+    const b = mk('button', 'btn' + (i === 0 ? ' on' : '')); b.textContent = i;
+    b.onclick = (v => () => { ST.row = v; rc.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
+    rc.appendChild(b);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

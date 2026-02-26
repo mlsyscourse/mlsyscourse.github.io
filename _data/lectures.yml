@@ -119,8 +119,8 @@
 - date: 02/25 Wed
   lecturer: Tianqi Chen
   title: >
-    Week 7: <strong>ML Compiler (2)</strong>
-  slides:
+    Week 7: <strong>ML Compiler -- GEMM on Modern GPUs</strong>
+  slides: /slides/modern-gpu-gemm/
   notes:
   readings:
   logistics:

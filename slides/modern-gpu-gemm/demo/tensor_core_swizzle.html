@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tensor Core + Swizzle Connection</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  .main { max-width:1100px; margin:0 auto; }
+
+  .step-box { background:var(--surface); border-radius:10px; padding:16px 20px; border:1px solid var(--border);
+    box-shadow:0 1px 3px rgba(0,0,0,.06); margin-bottom:16px; }
+  .step-box h2 { font-size:14px; font-weight:700; margin-bottom:8px; color:var(--accent); }
+  .step-box p { font-size:13px; line-height:1.6; color:var(--text); margin-bottom:6px; }
+  .step-box .highlight { font-weight:700; color:var(--color-good); }
+  .step-box .formula { font-family:'SF Mono','Fira Code',monospace; color:var(--accent); font-weight:600; font-size:13px; }
+
+  .grid-row { display:flex; gap:12px; justify-content:center; align-items:flex-start; margin:12px 0; flex-wrap:wrap; }
+  .block-wrap { text-align:center; }
+  .block-wrap .label { font-size:11px; font-weight:700; color:var(--dim); margin-bottom:4px; }
+
+  .grid { display:inline-grid; gap:1px; }
+  .cell {
+    width:22px; height:22px; border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:8px; font-weight:700; color:#fff; text-shadow:0 1px 1px rgba(0,0,0,.2);
+    transition:all .15s;
+  }
+  .cell.active { border:2px solid #222; }
+  .cell.dim { opacity:.2; }
+
+  .arrow-label { font-size:16px; color:var(--dim); font-weight:700; display:flex; align-items:center;
+    justify-content:center; padding:0 8px; }
+
+  .conclusion { max-width:1100px; margin:16px auto 0; background:#f0fdf4; border:1px solid #bbf7d0;
+    border-radius:10px; padding:14px 20px; font-size:14px; font-weight:600; color:var(--color-good);
+    text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>Why Swizzle Helps Tensor Cores</h1>
+<div class="sub">TC needs 16&times;16 fp16 tiles &mdash; swizzle makes each 8&times;8 sub-tile conflict-free</div>
+
+<div class="main">
+  <div class="step-box">
+    <h2>Step 1: Tensor Core reads 16&times;16 fp16 from shared memory</h2>
+    <p>A single TC instruction (e.g., <span class="formula">mma.sync m16n16k16</span>) needs a 16&times;16 fp16 tile.</p>
+    <p>In shared memory, this is 16 rows &times; 32 bytes/row = 512 bytes.</p>
+  </div>
+
+  <div class="step-box">
+    <h2>Step 2: Decompose 16&times;16 into four 8&times;8 sub-tiles</h2>
+    <p>Each 8&times;8 fp16 sub-tile = 8 rows &times; 16 bytes = 128 bytes = 1 swizzle atom (SWIZZLE_128B).</p>
+    <div class="grid-row" id="decomp"></div>
+  </div>
+
+  <div class="step-box">
+    <h2>Step 3: Each 8&times;8 sub-tile is conflict-free with swizzle</h2>
+    <p>With SWIZZLE_128B, reading any column of 8 elements within an 8&times;8 atom touches all 8 distinct sectors.</p>
+    <p><span class="highlight">Result: each 8&times;8 sub-tile reads in 1 cycle.</span></p>
+    <p>Total: 16&times;16 tile = <span class="highlight">4 conflict-free reads</span> of 8&times;8 blocks.</p>
+  </div>
+
+  <div class="step-box">
+    <h2>Step 4: Works for any transpose configuration</h2>
+    <p>Whether A is read row-wise or column-wise, the hardware always reads 16&times;K or K&times;16 sub-matrices.</p>
+    <p>These decompose into 8&times;8 fp16 tiles regardless of orientation.</p>
+    <p class="formula">A transposed: read K&times;16 &rarr; still decomposes into 8&times;8 tiles</p>
+    <p class="formula">A normal: read 16&times;K &rarr; still decomposes into 8&times;8 tiles</p>
+  </div>
+</div>
+
+<div class="conclusion">
+  Swizzle guarantees conflict-free shared memory access for tensor core operations, regardless of transpose.
+</div>
+
+<script>
+const BK = ['#5b9bd5','#ed9a3c','#d95555','#45b5a5','#5fb85f','#e0b828','#9d6eb5','#e87888'];
+
+function mk(t, c) { const d = document.createElement(t); if (c) d.className = c; return d; }
+
+(function init() {
+  // Build the 16x16 decomposition visual
+  const decomp = document.getElementById('decomp');
+  const labels = ['Top-Left (0:8, 0:8)', 'Top-Right (0:8, 8:16)', 'Bottom-Left (8:16, 0:8)', 'Bottom-Right (8:16, 8:16)'];
+
+  // Show 16x16 = 4 blocks of 8x8
+  const bigWrap = mk('div', 'block-wrap');
+  bigWrap.innerHTML = '<div class="label">16&times;16 fp16 tile</div>';
+  const bigGrid = mk('div', 'grid');
+  bigGrid.style.gridTemplateColumns = 'repeat(16, 22px)';
+  for (let r = 0; r < 16; r++) {
+    for (let c = 0; c < 16; c++) {
+      const d = mk('div', 'cell');
+      // Color by which 8x8 quadrant
+      const qi = (r < 8 ? 0 : 1) * 2 + (c < 8 ? 0 : 1);
+      d.style.background = BK[qi];
+      d.style.opacity = '0.6';
+      bigGrid.appendChild(d);
+    }
+  }
+  bigWrap.appendChild(bigGrid);
+  decomp.appendChild(bigWrap);
+
+  decomp.appendChild(Object.assign(mk('div', 'arrow-label'), {textContent: '='}));
+
+  // Show 4 separate 8x8 blocks
+  for (let qi = 0; qi < 4; qi++) {
+    const wrap = mk('div', 'block-wrap');
+    wrap.innerHTML = '<div class="label">' + labels[qi] + '</div>';
+    const grid = mk('div', 'grid');
+    grid.style.gridTemplateColumns = 'repeat(8, 22px)';
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const d = mk('div', 'cell');
+        // Color by sector (with swizzle: each col hits different sector)
+        const sec = (c ^ r) % 8;
+        d.style.background = BK[sec];
+        grid.appendChild(d);
+      }
+    }
+    wrap.appendChild(grid);
+    decomp.appendChild(wrap);
+  }
+})();
+</script>
+</body>
+</html>

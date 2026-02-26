@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEMM on Modern GPUs</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<link rel="stylesheet" href="mlsyscourse.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title -->
+<section class="title-slide">
+  <p class="main-title">15-442/15-642: Machine Learning Systems</p>
+  <p class="lecture-title">GEMM on Modern GPUs</p>
+  <div class="info">
+    Spring 2026<br>
+    Tianqi Chen and Zhihao Jia<br>
+    Carnegie Mellon University
+  </div>
+</section>
+
+<!-- Outline -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li>Swizzle Deeper Dive</li>
+    <li>Tensor Cores</li>
+    <li>TMA (Tensor Memory Accelerator)</li>
+    <li>Putting It Together</li>
+  </ul>
+</section>
+
+<!-- Outline: Swizzle Deeper Dive -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li>Swizzle Deeper Dive</li>
+    <li class="dim">Tensor Cores</li>
+    <li class="dim">TMA (Tensor Memory Accelerator)</li>
+    <li class="dim">Putting It Together</li>
+  </ul>
+</section>
+
+<!-- Demo: Recap: Simple 8x8 Swizzle -->
+<section class="demo-slide">
+  <h2>Recap: Simple 8x8 Swizzle</h2>
+  <div class="iframe-wrap" style="height:550px">
+    <iframe src="demo/swizzle_8x8.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Real Example: SWIZZLE_128B -->
+<section class="demo-slide">
+  <h2>Real Example: SWIZZLE_128B</h2>
+  <div class="iframe-wrap" style="height:550px">
+    <iframe src="demo/swizzle_128B.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: SWIZZLE_128B: Bank Sector View -->
+<section class="demo-slide">
+  <h2>SWIZZLE_128B: Bank Sector View</h2>
+  <div class="iframe-wrap" style="height:550px">
+    <iframe src="demo/swizzle_atom_128b.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Swizzle Atoms: All Formats -->
+<section class="demo-slide">
+  <h2>Swizzle Atoms: All Formats</h2>
+  <div class="iframe-wrap" style="height:550px">
+    <iframe src="demo/swizzle_atom_general.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Swizzle Imposes Tiling Constraint -->
+<section class="demo-slide">
+  <h2>Swizzle Imposes Tiling Constraint</h2>
+  <div class="iframe-wrap" style="height:550px">
+    <iframe src="demo/tiling_exploration.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.5);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Tensor Cores -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Swizzle Deeper Dive</li>
+    <li>Tensor Cores</li>
+    <li class="dim">TMA (Tensor Memory Accelerator)</li>
+    <li class="dim">Putting It Together</li>
+  </ul>
+</section>
+
+<!-- Demo: Tensor Core -->
+<section class="demo-slide">
+  <h2>Tensor Core</h2>
+  <div class="iframe-wrap" style="height:825px">
+    <iframe src="demo/tensor_core_shapes.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.75);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Tensor Core Benefit From Swizzling -->
+<section class="demo-slide">
+  <h2>Tensor Core Benefit From Swizzling</h2>
+  <div class="iframe-wrap" style="height:825px">
+    <iframe src="demo/tensor_core_to_swizzle.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.75);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: TMA (Tensor Memory Accelerator) -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Swizzle Deeper Dive</li>
+    <li class="dim">Tensor Cores</li>
+    <li>TMA (Tensor Memory Accelerator)</li>
+    <li class="dim">Putting It Together</li>
+  </ul>
+</section>
+
+<!-- Demo: TMA: Global to Shared Memory -->
+<section class="demo-slide">
+  <h2>TMA: Global to Shared Memory</h2>
+  <div class="iframe-wrap" style="height:825px">
+    <iframe src="demo/tma_copy.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.75);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: 3D TMA for Tiling and Swizzling -->
+<section class="demo-slide">
+  <h2>3D TMA for Tiling and Swizzling</h2>
+  <div class="iframe-wrap" style="height:825px">
+    <iframe src="demo/tma_3d.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.75);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Putting It Together -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Swizzle Deeper Dive</li>
+    <li class="dim">Tensor Cores</li>
+    <li class="dim">TMA (Tensor Memory Accelerator)</li>
+    <li>Putting It Together</li>
+  </ul>
+</section>
+
+<!-- Demo: Why Prefer 128B Swizzle? -->
+<section class="demo-slide">
+  <h2>Why Prefer 128B Swizzle?</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/why_128b.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: GEMM Optimization -->
+<section class="demo-slide">
+  <h2>GEMM Optimization</h2>
+  <div class="iframe-wrap" style="height:770px">
+    <iframe src="demo/gemm_workflow.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.7);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: End-to-End GEMM Example -->
+<section class="demo-slide">
+  <h2>End-to-End GEMM Example</h2>
+  <div class="iframe-wrap" style="height:825px">
+    <iframe src="demo/gemm_endtoend.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.75);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    width: 1200,
+    height: 700,
+    margin: 0,
+    center: false,
+    transition: 'slide',
+  });
+  // Forward arrow keys from embedded iframes to Reveal
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'revealKey') {
+      var ev = new KeyboardEvent('keydown', { keyCode: e.data.keyCode, bubbles: true });
+      document.dispatchEvent(ev);
+    }
+  });
+</script>
+</body>
+</html>
