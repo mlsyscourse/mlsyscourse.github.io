@@ -146,7 +146,7 @@
 - date: 03/09 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 9: Tutorial for TIRX dsl
+    Week 9: <strong>LLMs: Serving (speculative decoding, continuous batching)</strong>
   slides:
   readings:
   logistics: 
@@ -154,7 +154,7 @@
 - date: 03/11 Wed
   lecturer:
   title: >
-    Week 9: <strong>LLMs: Serving (speculative decoding, continuous batching)</strong>
+    Week 9: <strong>Tutorial for TIRX DSL</strong>
   slides:
   notes:
   readings: 
