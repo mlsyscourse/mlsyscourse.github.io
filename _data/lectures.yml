@@ -146,8 +146,8 @@
 - date: 03/09 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 9: <strong>LLMs: Serving (speculative decoding, continuous batching)</strong>
-  slides:
+    Week 9: <strong>LLM Serving (Continuous Batching, PagedAttention, RadixAttention)</strong>
+  slides: /slides/14-LLM-serving-part1.pdf
   readings:
   logistics: 
 
@@ -164,16 +164,16 @@
 - date: 03/16 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 10: <strong>LLMs: Training (PEFT)</strong>
+    Week 10: <strong>LLM Serving (Speculative Decoding)</strong>
   slides:
   notes:
   readings:
   logistics:
 
 - date: 03/18 Wed
-  lecturer: Tianqi Chen
+  lecturer: Zhihao Jia
   title: >
-    Week 10: <strong>LLMs: Mixture of Experts</strong>
+    Week 10: <strong>LLMs: Training (PEFT)</strong>
   slides:
   notes:
   readings:
@@ -183,7 +183,7 @@
 - date: 03/23 Mon
   lecturer: Tianqi Chen
   title: >
-    Week 11: <strong>Advanced topics:  Kernel DSLs and Warp Specialization</strong>
+    Week 11: <strong>LLMs: Mixture of Experts</strong>
   slides:
   notes:
   readings:
@@ -191,9 +191,9 @@
 
 
 - date: 03/25 Wed
-  lecturer: Zhihao Jia
+  lecturer: Tianqi Chen
   title: >
-    Week 11: <i>Advanced topics: Graph-level Optimization</i>
+    Week 11: <strong>Advanced topics:  Kernel DSLs and Warp Specialization</strong>
   slides:
   notes:
   readings:
@@ -203,7 +203,7 @@
 - date: 03/30 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 12: <strong>Advanced topics:  MegaKernels</strong>
+    Week 12: <strong>Advanced topics: Graph-level Optimization</strong>
   slides:
   notes:
   readings:
@@ -222,23 +222,23 @@
 - date: 04/06 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 13: <strong>Advanced topics: Automated ML Parallelization</strong>
+    Week 13: <strong>Advanced topics: MegaKernels</strong>
   notes:
   slides:
   readings:
   logistics:
 
 - date: 04/08 Wed
-  lecturer:
+  lecturer: Zhihao Jia
   title: >
-    Week 13: <strong>Advanced topics: TBD</strong>
+    Week 13: <strong>Advanced topics: Automated ML Parallelization</strong>
   slides:
   logistics:
 
 - date: 04/13 Mon
-  lecturer:
+  lecturer: Tianqi Chen
   title: >
-    Week 14: <strong>Guest Lecture: TBD</strong>
+    Week 14: <strong>Advanced topics: TBD</strong>
   slides:
   notes:
 
@@ -256,9 +256,9 @@
     Week 15: <strong></strong>
   logistics:
 
-- date: 04/22 Thu
+- date: 04/30 Friday
   lecturer:
   title: >
-    Week 16: <strong>Final Poster Presentations</strong>
+    Week 17: <strong>Final Poster Presentations</strong>
   logistics:
   readings:
