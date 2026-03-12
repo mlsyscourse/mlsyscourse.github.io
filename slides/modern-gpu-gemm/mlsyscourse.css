@@ -1,5 +1,6 @@
 /* CMU PPTX template styles for reveal.js slides
  * Template: 15-442/642 Machine Learning Systems
+ * Lecture: Blackwell GPU Architecture
  * Colors: title=#8B1514 (CMU red)
  * Fonts: Arial (body+heading), Monaco (code)
  */
@@ -18,6 +19,7 @@
   text-align: left;
   padding: 37px 82px 20px 82px;
   box-sizing: border-box;
+  top: 0 !important;
 }
 
 /* Title: 32pt dark red, not bold (matches PPTX master titleStyle) */
@@ -56,7 +58,7 @@
   display: flex !important; flex-direction: column;
   justify-content: center; align-items: center;
   padding: 0 82px !important;
-  height: 700px !important;
+  height: 720px !important;
   top: 0 !important;
 }
 .reveal .title-slide .main-title {
@@ -85,7 +87,7 @@
 
 /* Demo slides */
 .reveal .demo-slide {
-  padding: 37px 82px 0 82px !important;
+  padding: 37px 42px 0 42px !important;
   overflow: hidden;
 }
 .reveal .demo-slide h2 {
@@ -93,8 +95,8 @@
 }
 .reveal .demo-slide .iframe-wrap {
   position: relative;
-  width: 1036px; height: 560px;
-  overflow: hidden;
+  width: 1116px; height: 610px;
+  overflow-x: hidden; overflow-y: auto;
 }
 .reveal .demo-slide iframe {
   max-width: none !important;
@@ -104,7 +106,7 @@
   width: 1600px; height: 1100px;
   top: 0;
   left: 50%;
-  transform: translateX(-50%) scale(0.50);
+  transform: translateX(-50%) scale(0.70);
   transform-origin: top center;
 }
 

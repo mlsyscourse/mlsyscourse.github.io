@@ -65,7 +65,7 @@
   </div>
 </div>
 <div class="controls">
-  <div><span class="lbl">N (output rows)</span>
+  <div><span class="lbl">M (output rows)</span>
     <div class="bg" id="nc">
       <button class="btn on" data-v="16">16</button>
       <button class="btn" data-v="32">32</button>
@@ -73,7 +73,7 @@
       <button class="btn" data-v="128">128</button>
     </div>
   </div>
-  <div><span class="lbl">M (output cols)</span>
+  <div><span class="lbl">N (output cols)</span>
     <div class="bg" id="mc">
       <button class="btn on" data-v="16">16</button>
       <button class="btn" data-v="32">32</button>
@@ -166,16 +166,16 @@ function draw() {
   const nEnd = rOff + nBlocks - 1;
   const mEnd = cOff + mBlocks - 1;
   if (tA) {
-    document.getElementById('ad').textContent = 'K\u00d7N: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', N-cols ' + rOff + '-' + nEnd;
+    document.getElementById('ad').textContent = 'K\u00d7M: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', M-cols ' + rOff + '-' + nEnd;
   } else {
-    document.getElementById('ad').textContent = 'N\u00d7K: N-rows ' + rOff + '-' + nEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
+    document.getElementById('ad').textContent = 'M\u00d7K: M-rows ' + rOff + '-' + nEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
   }
   if (tB) {
-    document.getElementById('bd').textContent = 'M\u00d7K: M-rows ' + cOff + '-' + mEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
+    document.getElementById('bd').textContent = 'N\u00d7K: N-rows ' + cOff + '-' + mEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
   } else {
-    document.getElementById('bd').textContent = 'K\u00d7M: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', M-cols ' + cOff + '-' + mEnd;
+    document.getElementById('bd').textContent = 'K\u00d7N: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', N-cols ' + cOff + '-' + mEnd;
   }
-  document.getElementById('cd').textContent = ST.n + '\u00d7' + ST.m + ' accumulator';
+  document.getElementById('cd').textContent = 'M\u00d7N ' + ST.n + '\u00d7' + ST.m + ' accumulator';
 
   // Matrix A: 8x8 grid of blocks
   const ga = document.getElementById('ga'); ga.innerHTML = '';
@@ -256,8 +256,8 @@ function draw() {
 
   // Formula
   const fbox = document.getElementById('fbox');
-  const aRef = tA ? 'A\u1d40[k, n]' : 'A[n, k]';
-  const bRef = tB ? 'B\u1d40[m, k]' : 'B[k, m]';
+  const aRef = tA ? 'A\u1d40[k, m]' : 'A[m, k]';
+  const bRef = tB ? 'B\u1d40[n, k]' : 'B[k, n]';
   const accum = ST.k === 0 ? 0 : 1;
   const assign = accum ? '+=' : '=';
   fbox.textContent = 'MMA m' + ST.n + 'n' + ST.m + 'k16, accum=' + accum + '  |  C ' + assign + ' ' + aRef + ' \u00d7 ' + bRef;
