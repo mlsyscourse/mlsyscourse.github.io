@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step 9: The Complete Journey</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 20px 28px; max-width: 1100px; margin: 0 auto; }
+
+  /* ── Performance Table ── */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 14px;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  thead th {
+    text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; color: var(--dim);
+    border-bottom: 2px solid var(--border); white-space: nowrap;
+  }
+  tbody td {
+    padding: 7px 10px; border-bottom: 1px solid #f0f1f3;
+    font-family: 'SF Mono','Fira Code',monospace; font-size: 12px;
+    vertical-align: middle;
+  }
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+  tbody tr:hover td { background: var(--color-hover-bg); }
+
+  /* Highlighted demo-step rows */
+  tbody tr.hl-blue td { background: #eff6ff; }
+  tbody tr.hl-blue td:first-child { box-shadow: inset 4px 0 0 #3b82f6; }
+  tbody tr.hl-green td { background: #ecfdf5; }
+  tbody tr.hl-green td:first-child { box-shadow: inset 4px 0 0 #059669; }
+  tbody tr.hl-purple td { background: #f5f3ff; }
+  tbody tr.hl-purple td:first-child { box-shadow: inset 4px 0 0 #7c3aed; }
+  tbody tr.hl-gold td { background: #fffbeb; font-weight: 700; }
+  tbody tr.hl-gold td:first-child { box-shadow: inset 4px 0 0 #d97706; }
+
+  .step-num { font-weight: 700; color: var(--text); }
+  .technique { font-family: 'Inter','SF Pro',system-ui,sans-serif; font-weight: 600; }
+  .check { color: #059669; font-weight: 700; }
+
+  /* ── Big Jumps Cards ── */
+  .section-title {
+    font-size: 15px; font-weight: 700; text-align: center; margin-bottom: 12px;
+  }
+  .jumps-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1.3fr; gap: 12px;
+  }
+  .jump-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 14px 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    border-top: 3px solid transparent; text-align: center;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .jump-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+  .jump-card.blue   { border-top-color: #3b82f6; }
+  .jump-card.green  { border-top-color: #059669; }
+  .jump-card.purple { border-top-color: #7c3aed; }
+  .jump-card.gold   { border-top-color: #d97706; background: #fffdf5; }
+
+  .jump-card .jc-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 4px;
+  }
+  .jump-card.blue   .jc-label { color: #3b82f6; }
+  .jump-card.green  .jc-label { color: #059669; }
+  .jump-card.purple .jc-label { color: #7c3aed; }
+  .jump-card.gold   .jc-label { color: #d97706; }
+
+  .jump-card .jc-num {
+    font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 4px;
+  }
+  .jump-card.blue   .jc-num { color: #3b82f6; }
+  .jump-card.green  .jc-num { color: #059669; }
+  .jump-card.purple .jc-num { color: #7c3aed; }
+  .jump-card.gold   .jc-num { color: #d97706; font-size: 36px; }
+
+  .jump-card .jc-desc {
+    font-size: 11px; color: var(--dim); line-height: 1.4;
+  }
+
+  @media(max-width:800px) {
+    .jumps-row { grid-template-columns: 1fr 1fr; }
+  }
+  @media(max-width:500px) {
+    .jumps-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>The Complete Journey</h1>
+<p class="sub">From 0.02 to 1322 TFLOP/s &mdash; 63,000&times; throughput improvement in ~200 lines of TIRx</p>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 1 — Full Performance Table
+     ═══════════════════════════════════════════════════════════ -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Step</th>
+        <th>Technique</th>
+        <th>Shape</th>
+        <th>Time (ms)</th>
+        <th>TFLOP/s</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="hl-blue">
+        <td class="step-num">1</td>
+        <td class="technique">Sync load + MMA</td>
+        <td>128&sup2;&times;64</td>
+        <td>0.100</td>
+        <td>0.02</td>
+      </tr>
+      <tr>
+        <td class="step-num">2</td>
+        <td class="technique">K-loop</td>
+        <td>128&sup2;&times;4096</td>
+        <td>5.989</td>
+        <td>0.02</td>
+      </tr>
+      <tr>
+        <td class="step-num">3</td>
+        <td class="technique">Spatial tiling</td>
+        <td>2048&sup3;</td>
+        <td>6.013</td>
+        <td>2.9</td>
+      </tr>
+      <tr class="hl-blue">
+        <td class="step-num">4</td>
+        <td class="technique">TMA async</td>
+        <td>2048&sup3;</td>
+        <td>0.052</td>
+        <td>330</td>
+      </tr>
+      <tr>
+        <td class="step-num">5</td>
+        <td class="technique">Software pipeline</td>
+        <td>4096&sup3;</td>
+        <td>0.215</td>
+        <td>639</td>
+      </tr>
+      <tr>
+        <td class="step-num">6</td>
+        <td class="technique">Persistent kernel</td>
+        <td>4096&sup3;</td>
+        <td>0.190</td>
+        <td>723</td>
+      </tr>
+      <tr class="hl-purple">
+        <td class="step-num">7</td>
+        <td class="technique">Warp specialization</td>
+        <td>4096&sup3;</td>
+        <td>0.228</td>
+        <td>603</td>
+      </tr>
+      <tr>
+        <td class="step-num">8</td>
+        <td class="technique">Deep pipeline</td>
+        <td>4096&sup3;</td>
+        <td>0.130</td>
+        <td>1057</td>
+      </tr>
+      <tr class="hl-green">
+        <td class="step-num">9</td>
+        <td class="technique">2-CTA cluster</td>
+        <td>4096&sup3;</td>
+        <td>0.111</td>
+        <td><span class="check">1238</span></td>
+      </tr>
+      <tr>
+        <td class="step-num">10</td>
+        <td class="technique">Multi-consumer</td>
+        <td>4096&sup3;</td>
+        <td>0.104</td>
+        <td><span class="check">1322</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 2 — What Made the Difference
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section-title">What Made the Difference</div>
+
+<div class="jumps-row">
+
+  <div class="jump-card blue">
+    <div class="jc-label">Step 1 &rarr; 4: TMA Async</div>
+    <div class="jc-num">16,500&times;</div>
+    <div class="jc-desc">0.02 &rarr; 330 TFLOP/s. K-loop, spatial tiling, TMA hardware data mover</div>
+  </div>
+
+  <div class="jump-card purple">
+    <div class="jc-label">Step 4 &rarr; 7: Warp Spec</div>
+    <div class="jc-num">1.8&times;</div>
+    <div class="jc-desc">330 &rarr; 603 TFLOP/s. Pipeline, persistent kernel, overlap load/compute/store</div>
+  </div>
+
+  <div class="jump-card green">
+    <div class="jc-label">Step 7 &rarr; 9: Cluster</div>
+    <div class="jc-num">2.1&times;</div>
+    <div class="jc-desc">603 &rarr; 1238 TFLOP/s. 4-stage pipeline + 2-CTA cross-SM cooperation</div>
+  </div>
+
+  <div class="jump-card gold">
+    <div class="jc-label">Peak (Step 10)</div>
+    <div class="jc-num">1322</div>
+    <div class="jc-desc">TFLOP/s at 4096&sup3; in ~200 LOC of TIRx Python</div>
+  </div>
+
+</div>
+
+</body>
+</html>

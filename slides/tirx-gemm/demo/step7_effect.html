@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step 7: Pipeline in Action</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 20px 24px; max-width: 1200px; margin: 0 auto; }
+
+  /* ── Play controls ── */
+  .play-row {
+    display: flex; align-items: center; gap: 12px;
+    justify-content: center; margin-bottom: 12px;
+  }
+  .play-btn {
+    padding: 5px 14px; border: 1px solid var(--accent); background: var(--accent); color: #fff;
+    cursor: pointer; border-radius: 5px; font-size: 13px; font-weight: 600;
+    font-family: inherit; transition: all .12s;
+  }
+  .play-btn:hover { background: #2563eb; }
+  .play-btn.sec { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .play-btn.sec:hover { background: #eef0f4; }
+  .cycle-disp {
+    font-size: 13px; font-family: 'SF Mono','Fira Code',monospace;
+    font-weight: 600; min-width: 90px; text-align: center;
+  }
+
+  /* ── Timeline section ── */
+  .tl-wrap {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .tl-cont { position: relative; }
+  .tl-grid { display: grid; gap: 4px; position: relative; z-index: 1; }
+  .cyc-hdr {
+    font-size: 9px; color: var(--dim); text-align: center;
+    display: flex; align-items: flex-end; justify-content: center;
+    font-weight: 600; font-family: 'SF Mono','Fira Code',monospace;
+  }
+  .lane-lbl {
+    font-size: 10px; font-weight: 700; display: flex; align-items: center;
+    padding: 0 6px; color: #fff; border-radius: 4px 0 0 4px; white-space: nowrap;
+  }
+  .lane-lbl.tma { background: #3b82f6; }
+  .lane-lbl.mma { background: #059669; }
+  .lane-lbl.wb  { background: #d97706; }
+
+  .blk {
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.12);
+    font-family: 'SF Mono','Fira Code',monospace;
+    opacity: 0.65; transition: all .25s; position: relative;
+  }
+  .blk.tma { background: #3b82f6; }
+  .blk.mma { background: #059669; }
+  .blk.wba { background: #d97706; }
+  .blk.idle {
+    background: transparent; border: 1px dashed #ccc;
+    color: #bbb; box-shadow: none; opacity: .3; font-size: 8px;
+  }
+  .blk.active {
+    opacity: 1; transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,.3); z-index: 5;
+  }
+  .blk.past { opacity: .4; }
+
+  /* Steady-state overlay */
+  .steady-box {
+    position: absolute; border: 1.5px dashed #059669; border-radius: 6px;
+    background: rgba(5,150,105,.06); z-index: 0; pointer-events: none;
+  }
+  .steady-box span {
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: #059669; font-weight: 700; white-space: nowrap;
+    font-family: 'SF Mono','Fira Code',monospace;
+  }
+
+  .arrow-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 3; overflow: visible;
+  }
+
+  /* ── Performance cards ── */
+  .cards {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .card .ct {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--dim); margin-bottom: 4px;
+  }
+  .card .bn {
+    font-size: 34px; font-weight: 800; line-height: 1.1; margin-bottom: 4px;
+  }
+  .card .bn.blue   { color: #3b82f6; }
+  .card .bn.green  { color: #059669; }
+  .card .bn.orange { color: #d97706; }
+  .card .dt { font-size: 11px; color: var(--dim); line-height: 1.4; }
+
+  /* ── Performance bars ── */
+  .bars-wrap {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .bar-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .bar-row:last-of-type { margin-bottom: 0; }
+  .bar-lbl {
+    font-size: 12px; font-weight: 600; width: 72px;
+    text-align: right; white-space: nowrap;
+  }
+  .bar-track {
+    flex: 1; height: 14px; background: #f0f1f3;
+    border-radius: 7px; overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 7px; }
+  .bar-val {
+    font-size: 12px; font-weight: 700;
+    font-family: 'SF Mono','Fira Code',monospace; width: 52px;
+  }
+  .bar-note {
+    text-align: center; font-size: 12px; color: #059669;
+    font-weight: 600; margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Pipeline in Action</h1>
+  <p class="sub">Pipelined execution: TMA, MMA, and Writeback overlap (animation shows 6-stage example)</p>
+</header>
+
+<!-- ════ Section 1: Detailed Pipeline Timeline ════ -->
+<div class="tl-wrap">
+  <div class="play-row">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()">&#9654; Play</button>
+    <span class="cycle-disp" id="cycDisp">Cycle: &mdash;</span>
+    <button class="play-btn sec" onclick="resetAnim()">&#8634; Reset</button>
+  </div>
+  <div class="tl-cont" id="tlCont">
+    <div class="tl-grid" id="tlGrid"></div>
+    <svg class="arrow-layer" id="arrSvg"></svg>
+  </div>
+</div>
+
+<!-- ════ Section 2: Performance Summary ════ -->
+<div class="cards">
+  <div class="card">
+    <div class="ct">Pipeline Depth</div>
+    <div class="bn blue">2</div>
+    <div class="dt">2 SMEM stages, warp-specialized roles. Step 8 bumps to PIPE_DEPTH=4.</div>
+  </div>
+  <div class="card">
+    <div class="ct">Throughput (4096&sup3;)</div>
+    <div class="bn green">603</div>
+    <div class="dt">TFLOP/s. Structure enables overlap &mdash; deep pipeline (Step 8) reaches 1057 TFLOP/s.</div>
+  </div>
+  <div class="card">
+    <div class="ct">Key Benefit</div>
+    <div class="bn orange">Overlap</div>
+    <div class="dt">Load, compute, writeback run concurrently. Foundation for Steps 8-10.</div>
+  </div>
+</div>
+
+<div class="bars-wrap">
+  <div class="bar-row">
+    <span class="bar-lbl">Step 6:</span>
+    <div class="bar-track"><div class="bar-fill" style="width:55%;background:#3b82f6"></div></div>
+    <span class="bar-val" style="color:#3b82f6">723</span>
+  </div>
+  <div class="bar-row">
+    <span class="bar-lbl">Step 7:</span>
+    <div class="bar-track"><div class="bar-fill" style="width:46%;background:#059669"></div></div>
+    <span class="bar-val" style="color:#059669">603</span>
+  </div>
+  <div class="bar-row">
+    <span class="bar-lbl">Step 8:</span>
+    <div class="bar-track"><div class="bar-fill" style="width:80%;background:#7c3aed"></div></div>
+    <span class="bar-val" style="color:#7c3aed">1057</span>
+  </div>
+  <div class="bar-row">
+    <span class="bar-lbl">Step 10:</span>
+    <div class="bar-track"><div class="bar-fill" style="width:100%;background:#d97706"></div></div>
+    <span class="bar-val" style="color:#d97706">1322</span>
+  </div>
+  <p class="bar-note">TFLOP/s at M=N=K=4096. Step 7 is structural — Step 8 adds deep pipeline for speed.</p>
+</div>
+
+<script>
+(function() {
+  var N = 18, P = 6;
+  var grid = document.getElementById('tlGrid');
+  var svg  = document.getElementById('arrSvg');
+  var cont = document.getElementById('tlCont');
+  var B = { tma: [], mma: [], wb: [] };
+  var WB_AT = { 7: 'WB0', 13: 'WB1' };
+
+  grid.style.gridTemplateColumns = '86px repeat(' + N + ', 46px)';
+  grid.style.gridTemplateRows = '22px 36px 36px 36px';
+
+  /* ── Row 0: cycle headers ── */
+  grid.appendChild(document.createElement('div'));
+  for (var c = 0; c < N; c++) {
+    var h = document.createElement('div');
+    h.className = 'cyc-hdr'; h.textContent = c;
+    grid.appendChild(h);
+  }
+
+  function pr(tile) { return tile > 0 ? new Array(Math.min(tile, 2) + 1).join("'") : ''; }
+
+  /* ── TMA lane ── */
+  var ll = document.createElement('div');
+  ll.className = 'lane-lbl tma'; ll.textContent = 'TMA Load';
+  grid.appendChild(ll);
+  for (c = 0; c < N; c++) {
+    var tile = Math.floor(c / P), stg = c % P;
+    var b = document.createElement('div');
+    b.className = 'blk tma';
+    b.textContent = 'L' + stg + pr(tile);
+    grid.appendChild(b);
+    B.tma[c] = b;
+  }
+
+  /* ── MMA lane ── */
+  ll = document.createElement('div');
+  ll.className = 'lane-lbl mma'; ll.textContent = 'MMA Compute';
+  grid.appendChild(ll);
+  for (c = 0; c < N; c++) {
+    b = document.createElement('div');
+    if (c === 0) {
+      b.className = 'blk idle'; b.textContent = '\u2014';
+    } else {
+      var idx = c - 1;
+      tile = Math.floor(idx / P); stg = idx % P;
+      b.className = 'blk mma';
+      b.textContent = 'M' + stg + pr(tile);
+    }
+    grid.appendChild(b);
+    B.mma[c] = b;
+  }
+
+  /* ── Writeback lane ── */
+  ll = document.createElement('div');
+  ll.className = 'lane-lbl wb'; ll.textContent = 'Writeback';
+  grid.appendChild(ll);
+  for (c = 0; c < N; c++) {
+    b = document.createElement('div');
+    if (WB_AT[c]) {
+      b.className = 'blk wba'; b.textContent = WB_AT[c];
+    } else {
+      b.className = 'blk idle';
+    }
+    grid.appendChild(b);
+    B.wb[c] = b;
+  }
+
+  /* ── Steady-state highlight (cycles 3-12) ── */
+  function layoutSteady() {
+    var old = document.querySelector('.steady-box');
+    if (old) old.remove();
+    var a = B.tma[3], z = B.wb[12];
+    if (!a || !z) return;
+    var cr = cont.getBoundingClientRect();
+    var ar = a.getBoundingClientRect(), zr = z.getBoundingClientRect();
+    var d = document.createElement('div');
+    d.className = 'steady-box';
+    d.style.left   = (ar.left - cr.left - 4) + 'px';
+    d.style.top    = (ar.top  - cr.top - 20) + 'px';
+    d.style.width  = (zr.right - ar.left + 8) + 'px';
+    d.style.height = (zr.bottom - ar.top + 24) + 'px';
+    d.innerHTML = '<span>Steady state: all actors busy</span>';
+    cont.appendChild(d);
+  }
+
+  /* ── SVG helpers ── */
+  function ns(tag) { return document.createElementNS('http://www.w3.org/2000/svg', tag); }
+  function off(el) {
+    var r = el.getBoundingClientRect(), cr = cont.getBoundingClientRect();
+    return { l: r.left - cr.left, t: r.top - cr.top, w: r.width, h: r.height };
+  }
+  function bot(el) { var o = off(el); return { x: o.l + o.w / 2, y: o.t + o.h }; }
+  function tp(el)  { var o = off(el); return { x: o.l + o.w / 2, y: o.t }; }
+
+  function mkLine(a, b, col, dash, mi, op) {
+    var l = ns('line');
+    l.setAttribute('x1', a.x); l.setAttribute('y1', a.y);
+    l.setAttribute('x2', b.x); l.setAttribute('y2', b.y);
+    l.setAttribute('stroke', col); l.setAttribute('stroke-width', '1.5');
+    l.setAttribute('opacity', op || .5);
+    if (dash) l.setAttribute('stroke-dasharray', '4,3');
+    if (mi !== undefined) l.setAttribute('marker-end', 'url(#ah' + mi + ')');
+    svg.appendChild(l);
+  }
+
+  function mkLabel(x, y, txt, col) {
+    var t = ns('text');
+    t.setAttribute('x', x); t.setAttribute('y', y);
+    t.setAttribute('fill', col); t.setAttribute('font-size', '7.5');
+    t.setAttribute('font-weight', '600');
+    t.setAttribute('font-family', "'SF Mono','Fira Code',monospace");
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = txt;
+    svg.appendChild(t);
+  }
+
+  /* ── Arrow drawing ── */
+  function drawArrows(ac) {
+    svg.innerHTML = '';
+    svg.setAttribute('width', cont.scrollWidth);
+    svg.setAttribute('height', cont.scrollHeight);
+
+    var defs = ns('defs');
+    var colors = [['#3b82f6', 0], ['#059669', 1], ['#d97706', 2], ['#666', 3]];
+    colors.forEach(function(p) {
+      var m = ns('marker');
+      m.setAttribute('id', 'ah' + p[1]);
+      m.setAttribute('markerWidth', '6'); m.setAttribute('markerHeight', '5');
+      m.setAttribute('refX', '5'); m.setAttribute('refY', '2.5');
+      m.setAttribute('orient', 'auto');
+      var pg = ns('polygon');
+      pg.setAttribute('points', '0,0 6,2.5 0,5');
+      pg.setAttribute('fill', p[0]);
+      m.appendChild(pg); defs.appendChild(m);
+    });
+    svg.appendChild(defs);
+
+    var all = ac === undefined || ac < 0;
+
+    /* tma2mma: TMA[c] → MMA[c+1] — data ready signal */
+    var t2mSet = all ? [0, 1, 2, 3, 6, 7, 12, 13] : (ac < N - 1 ? [ac] : []);
+    t2mSet.forEach(function(c) {
+      if (c >= N - 1) return;
+      if (B.mma[c + 1].classList.contains('idle')) return;
+      mkLine(bot(B.tma[c]), tp(B.mma[c + 1]), '#3b82f6', true, 0, all ? .25 : .85);
+    });
+    if (all) {
+      var m0 = bot(B.tma[0]), m1 = tp(B.mma[1]);
+      mkLabel((m0.x + m1.x) / 2 + 22, (m0.y + m1.y) / 2 + 1, 'tma2mma[s]', '#3b82f6');
+    }
+
+    /* mma2tma: buffer reuse — MMA[c] frees stage → TMA reuses at c-1+P */
+    var m2tSet = all ? [[1, 6], [7, 12]] : [];
+    if (!all && ac >= 1 && ac <= N - 1) {
+      var ri = (ac - 1) + P;
+      if (ri < N) m2tSet.push([ac, ri]);
+    }
+    m2tSet.forEach(function(pair) {
+      if (pair[1] >= N) return;
+      var from = bot(B.mma[pair[0]]), to = tp(B.tma[pair[1]]);
+      var p = ns('path');
+      var mx = (from.x + to.x) / 2, my = Math.min(from.y, to.y) - 18;
+      p.setAttribute('d', 'M' + from.x + ',' + from.y +
+        ' C' + from.x + ',' + (from.y - 22) +
+        ' ' + to.x + ',' + (to.y + 22) +
+        ' ' + to.x + ',' + to.y);
+      p.setAttribute('stroke', '#059669');
+      p.setAttribute('stroke-width', '1.2');
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke-dasharray', '4,3');
+      p.setAttribute('opacity', all ? .2 : .7);
+      p.setAttribute('marker-end', 'url(#ah1)');
+      svg.appendChild(p);
+    });
+    if (all && m2tSet.length) {
+      var f0 = bot(B.mma[1]), t0 = tp(B.tma[6]);
+      mkLabel((f0.x + t0.x) / 2, Math.min(f0.y, t0.y) - 6, 'mma2tma[s]', '#059669');
+    }
+
+    /* mma2ld: last MMA of tile → Writeback */
+    [[6, 7], [12, 13]].forEach(function(pair) {
+      if (pair[1] >= N || !WB_AT[pair[1]]) return;
+      if (!all && ac !== pair[0] && ac !== pair[1]) return;
+      mkLine(bot(B.mma[pair[0]]), tp(B.wb[pair[1]]), '#d97706', false, 2, all ? .45 : .9);
+      var f = bot(B.mma[pair[0]]), t = tp(B.wb[pair[1]]);
+      mkLabel((f.x + t.x) / 2 + 18, (f.y + t.y) / 2 + 2, 'mma2ld', '#d97706');
+    });
+
+    /* ld2mma: Writeback → next MMA tile start */
+    [[7, 7], [13, 13]].forEach(function(pair) {
+      if (pair[1] >= N || !WB_AT[pair[0]]) return;
+      if (B.mma[pair[1]].classList.contains('idle')) return;
+      if (!all && ac !== pair[0]) return;
+      var from = tp(B.wb[pair[0]]), to = bot(B.mma[pair[1]]);
+      var p = ns('path');
+      p.setAttribute('d', 'M' + (from.x - 14) + ',' + from.y +
+        ' C' + (from.x - 30) + ',' + ((from.y + to.y) / 2) +
+        ' ' + (to.x - 30) + ',' + ((from.y + to.y) / 2) +
+        ' ' + (to.x - 14) + ',' + to.y);
+      p.setAttribute('stroke', '#d97706');
+      p.setAttribute('stroke-width', '1.5');
+      p.setAttribute('fill', 'none');
+      p.setAttribute('opacity', all ? .45 : .9);
+      p.setAttribute('marker-end', 'url(#ah2)');
+      svg.appendChild(p);
+      mkLabel(from.x - 34, (from.y + to.y) / 2 + 2, 'ld2mma', '#b45309');
+    });
+  }
+
+  /* ── Animation state ── */
+  var playing = false, cur = -1, tmr = null;
+
+  function upd() {
+    var allBlocks = document.querySelectorAll('.blk');
+    for (var i = 0; i < allBlocks.length; i++) {
+      allBlocks[i].classList.remove('active', 'past');
+    }
+    if (cur < 0) { drawArrows(); return; }
+    for (var c = 0; c < N; c++) {
+      ['tma', 'mma', 'wb'].forEach(function(ln) {
+        var blk = B[ln][c];
+        if (blk.classList.contains('idle')) return;
+        if (c < cur) blk.classList.add('past');
+        else if (c === cur) blk.classList.add('active');
+      });
+    }
+    document.getElementById('cycDisp').textContent = 'Cycle: ' + cur;
+    drawArrows(cur);
+  }
+
+  window.togglePlay = function() {
+    if (playing) {
+      clearInterval(tmr); playing = false;
+      document.getElementById('playBtn').innerHTML = '&#9654; Play';
+      return;
+    }
+    if (cur >= N - 1) cur = -1;
+    playing = true;
+    document.getElementById('playBtn').innerHTML = '&#9646;&#9646; Pause';
+    tmr = setInterval(function() {
+      cur++;
+      if (cur >= N) {
+        clearInterval(tmr); playing = false; cur = N - 1;
+        document.getElementById('playBtn').innerHTML = '&#9654; Play';
+      }
+      upd();
+    }, 800);
+  };
+
+  window.resetAnim = function() {
+    clearInterval(tmr); playing = false; cur = -1;
+    document.getElementById('playBtn').innerHTML = '&#9654; Play';
+    document.getElementById('cycDisp').innerHTML = 'Cycle: &mdash;';
+    upd();
+  };
+
+  /* ── Initial render ── */
+  requestAnimationFrame(function() {
+    layoutSteady();
+    drawArrows();
+  });
+  window.addEventListener('resize', function() {
+    layoutSteady();
+    drawArrows(cur);
+  });
+})();
+</script>
+</body>
+</html>

@@ -149,13 +149,13 @@
     Week 9: <strong>LLM Serving (Continuous Batching, PagedAttention, RadixAttention)</strong>
   slides: /slides/14-LLM-serving-part1.pdf
   readings:
-  logistics: 
+  logistics:
 
 - date: 03/11 Wed
   lecturer:
   title: >
-    Week 9: <strong>Tutorial for TIRX DSL</strong>
-  slides:
+    Week 9: <strong>Blackwell GPU and TIRx</strong>
+  slides: /slides/tirx-gemm/
   notes:
   readings: 
   logistics: Lab 3 Release; Lab 2 Due

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEMM Data Pipeline</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 24px 28px; max-width: 1300px; margin: 0 auto; }
+
+  .pipeline {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 0; margin: 24px auto 28px; flex-wrap: nowrap;
+  }
+  .phase-group {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .phase-label {
+    font-size: 10.5px; font-weight: 700; white-space: nowrap;
+    padding: 3px 10px 4px; border-radius: 6px 6px 0 0;
+    margin-bottom: 6px; letter-spacing: .02em;
+  }
+  .phase-label.pl-prologue { background: #dbeafe; color: #1d4ed8; }
+  .phase-label.pl-mainloop { background: #d1fae5; color: #065f46; }
+  .phase-label.pl-epilogue { background: #fce7f3; color: #9d174d; }
+  .phase-stages {
+    display: flex; align-items: center;
+  }
+  .stage {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 5px; flex-shrink: 0;
+  }
+  .stage-box {
+    padding: 16px 18px; border-radius: 10px; text-align: center;
+    font-weight: 700; font-size: 15px; border: 2.5px solid;
+    width: 100px; height: 62px; cursor: pointer;
+    transition: all .3s ease;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .stage-box:hover { transform: translateY(-3px); box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  .stage-box.selected { box-shadow: 0 0 0 3px rgba(0,0,0,.12); transform: translateY(-3px); }
+  .stage-sub {
+    font-size: 11px; font-weight: 600; color: var(--dim);
+  }
+
+  .s-gmem  { border-color: #6b7280; background: #f3f4f6; color: #374151; }
+  .s-smem  { border-color: #8b5cf6; background: #ede9fe; color: #5b21b6; }
+  .s-tmem  { border-color: #d97706; background: #fef3c7; color: #92400e; }
+  .s-reg   { border-color: #dc2626; background: #fee2e2; color: #991b1b; }
+
+  .arrow-h {
+    display: flex; align-items: center; flex-direction: column;
+    gap: 2px; flex-shrink: 0; padding: 0 3px;
+  }
+  .arrow-h svg { width: 40px; height: 20px; }
+  .arrow-label {
+    font-size: 10px; font-weight: 700; white-space: nowrap;
+    cursor: pointer; transition: all .2s;
+    padding: 2px 6px; border-radius: 4px;
+    background: rgba(0,0,0,.05);
+  }
+  .arrow-label:hover { background: rgba(0,0,0,.1); }
+  .arrow-label.c-blue   { color: #3b82f6; }
+  .arrow-label.c-green  { color: #059669; }
+  .arrow-label.c-amber  { color: #d97706; }
+  .arrow-label.c-red    { color: #dc2626; }
+
+  .detail-panel {
+    max-width: 1000px; margin: 0 auto;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface); padding: 14px 18px;
+    min-height: 70px; transition: border-color .3s;
+  }
+  .detail-panel .dp-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .detail-panel .dp-body { font-size: 13px; line-height: 1.65; color: #475569; }
+  .detail-panel.empty .dp-body { color: #94a3b8; }
+
+  .sum-section-label {
+    max-width: 1000px; margin: 20px auto 6px;
+    font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em;
+  }
+  .summary-bar {
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .sum-item {
+    text-align: center; padding: 10px 8px 10px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: #fafbfc;
+    border-top-width: 3px;
+  }
+  .sum-item .sum-op {
+    font-size: 13px; font-weight: 800; margin-bottom: 3px; font-family: monospace;
+  }
+  .sum-item .sum-role { font-size: 10.5px; color: #64748b; line-height: 1.4; }
+
+  @media(max-width:900px) {
+    .pipeline { flex-wrap: wrap; gap: 8px; }
+    .summary-bar { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <h1>GEMM Data Pipeline on Blackwell</h1>
+  <p class="sub">D = A × B — data flows through 4 hardware units (GMEM, SMEM, TMEM, registers) — click any stage</p>
+
+  <div class="pipeline">
+    <div class="stage">
+      <div class="stage-box s-gmem" data-stage="gmem1">GMEM<br><span style="font-size:12px;font-weight:500;">A, B</span></div>
+      <div class="stage-sub">HBM</div>
+    </div>
+    <div class="arrow-h">
+      <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#3b82f6" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#3b82f6"/></svg>
+      <div class="arrow-label c-blue" data-action="tma_load">TMA load</div>
+    </div>
+    <div class="stage">
+      <div class="stage-box s-smem" data-stage="smem1">SMEM</div>
+      <div class="stage-sub">on-chip</div>
+    </div>
+    <div class="arrow-h">
+      <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#059669" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#059669"/></svg>
+      <div class="arrow-label c-green" data-action="mma">tcgen05.mma</div>
+    </div>
+    <div class="stage">
+      <div class="stage-box s-tmem" data-stage="tmem">TMEM<br><span style="font-size:12px;font-weight:500;">accum</span></div>
+      <div class="stage-sub">tensor memory</div>
+    </div>
+    <div class="arrow-h">
+      <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#d97706" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#d97706"/></svg>
+      <div class="arrow-label c-amber" data-action="ld">tcgen05.ld</div>
+    </div>
+    <div class="stage">
+      <div class="stage-box s-reg" data-stage="reg">Reg<br><span style="font-size:12px;font-weight:500;">cast</span></div>
+      <div class="stage-sub">per-thread</div>
+    </div>
+    <div class="arrow-h">
+      <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#dc2626" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#dc2626"/></svg>
+      <div class="arrow-label c-red" data-action="store">store</div>
+    </div>
+    <div class="stage">
+      <div class="stage-box s-smem" data-stage="smem2">SMEM</div>
+      <div class="stage-sub">writeback buf</div>
+    </div>
+    <div class="arrow-h">
+      <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#3b82f6" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#3b82f6"/></svg>
+      <div class="arrow-label c-blue" data-action="tma_store">TMA store</div>
+    </div>
+
+    <!-- Epilogue -->
+    <div class="phase-group">
+      <div class="phase-label pl-epilogue">Epilogue: TMEM → Reg → SMEM → GMEM</div>
+      <div class="phase-stages">
+        <div class="arrow-h">
+          <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#d97706" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#d97706"/></svg>
+          <div class="arrow-label c-amber">tcgen05.ld</div>
+        </div>
+        <div class="stage">
+          <div class="stage-box s-reg" data-stage="reg">Reg<br><span style="font-size:12px;font-weight:500;">cast</span></div>
+          <div class="stage-sub">per-thread</div>
+        </div>
+        <div class="arrow-h">
+          <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#dc2626" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#dc2626"/></svg>
+          <div class="arrow-label c-red">store</div>
+        </div>
+        <div class="stage">
+          <div class="stage-box s-smem" data-stage="smem2">SMEM</div>
+          <div class="stage-sub">writeback buf</div>
+        </div>
+        <div class="arrow-h">
+          <svg viewBox="0 0 40 20"><path d="M2 10 H30" stroke="#3b82f6" stroke-width="2.5" fill="none"/><polygon points="28,5 38,10 28,15" fill="#3b82f6"/></svg>
+          <div class="arrow-label c-blue">TMA store</div>
+        </div>
+        <div class="stage">
+          <div class="stage-box s-gmem" data-stage="gmem2">GMEM<br><span style="font-size:12px;font-weight:500;">D</span></div>
+          <div class="stage-sub">HBM</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="detail-panel empty" id="detailPanel">
+    <div class="dp-title" id="dpTitle"></div>
+    <div class="dp-body" id="dpBody">Click an above stage to see which hardware unit handles it.</div>
+  </div>
+
+  <p class="sum-section-label">Operations</p>
+  <div class="summary-bar">
+    <div class="sum-item" style="border-top-color:#3b82f6;">
+      <div class="sum-op" style="color:#3b82f6;">TMA load / store</div>
+      <div class="sum-role">load: GMEM → SMEM (A, B tiles)<br>store: SMEM → GMEM (result D)</div>
+    </div>
+    <div class="sum-item" style="border-top-color:#059669;">
+      <div class="sum-op" style="color:#059669;">tcgen05.mma</div>
+      <div class="sum-role">SMEM → TMEM<br>multiply-accumulate</div>
+    </div>
+    <div class="sum-item" style="border-top-color:#d97706;">
+      <div class="sum-op" style="color:#d97706;">tcgen05.ld</div>
+      <div class="sum-role">TMEM → Reg<br>read accumulators</div>
+    </div>
+    <div class="sum-item" style="border-top-color:#dc2626;">
+      <div class="sum-op" style="color:#dc2626;">Register File</div>
+      <div class="sum-role">cast fp32 → fp16<br>write to SMEM for TMA store</div>
+    </div>
+  </div>
+
+<script>
+(function() {
+  var info = {
+    gmem1: { title: 'Global Memory (HBM)', color: '#6b7280',
+      body: 'Input matrices A and B live in HBM. High capacity but relatively slow. The TMA engine fetches tiles from here.' },
+    smem1: { title: 'Shared Memory — Load Buffer', color: '#8b5cf6',
+      body: 'TMA loads A/B tiles here in swizzled layout (to reduce bank conflicts for tcgen05 access). The Tensor Core reads from SMEM to perform MMA.' },
+    tmem: { title: 'Tensor Memory (TMEM) — Accumulator', color: '#d97706',
+      body: 'New in Blackwell. Organized by 128 lanes × N columns of fp32; tcgen05.mma accumulates here across K-loop iterations, reducing accumulator register pressure.' },
+    reg: { title: 'Register File — Cast & Reformat', color: '#dc2626',
+      body: 'In the common GEMM epilogue, TMEM doesn\'t write directly to GMEM. Results are read from TMEM into registers (fp32), cast to fp16 per-thread, then written to SMEM for TMA store.' },
+    smem2: { title: 'Shared Memory — Writeback Buffer', color: '#8b5cf6',
+      body: 'Receives fp16 results from registers. TMA engine then stores this tile back to GMEM.' },
+    gmem2: { title: 'Global Memory (HBM) — Output', color: '#6b7280',
+      body: 'Output matrix D. TMA store writes the final fp16 result from SMEM back to HBM.' }
+  };
+
+  var actions = {
+    tma_load:  { title: 'TMA Load — cp.async.bulk.tensor', color: '#3b82f6',
+      body: 'TMA engine copies a tile from GMEM to SMEM. One thread issues the instruction; HW handles address calculation, swizzling, and async transfer.',
+      stages: ['gmem1', 'smem1'] },
+    mma:       { title: 'tcgen05.mma — Tensor Core MMA', color: '#059669',
+      body: 'Tensor Core reads A/B tiles from SMEM and accumulates C += A × B into TMEM. Single warp issues; HW distributes across 128 TMEM lanes.',
+      stages: ['smem1', 'tmem'] },
+    ld:        { title: 'tcgen05.ld — Load from Tensor Memory', color: '#d97706',
+      body: 'Reads accumulated fp32 results from TMEM into registers for writeback. Each thread gets its slice of the output tile.',
+      stages: ['tmem', 'reg'] },
+    store:     { title: 'Store — Cast & Write to SMEM', color: '#dc2626',
+      body: 'CUDA cores cast fp32 → fp16 in registers, then store results to SMEM writeback buffer for TMA to flush to GMEM.',
+      stages: ['reg', 'smem2'] },
+    tma_store: { title: 'TMA Store — cp.async.bulk.tensor', color: '#3b82f6',
+      body: 'TMA engine copies the fp16 result tile from SMEM writeback buffer back to GMEM. Async — overlaps with next iteration.',
+      stages: ['smem2', 'gmem2'] }
+  };
+
+  var panel = document.getElementById('detailPanel');
+  var titleEl = document.getElementById('dpTitle');
+  var bodyEl = document.getElementById('dpBody');
+  var boxes = document.querySelectorAll('.stage-box');
+  var labels = document.querySelectorAll('.arrow-label[data-action]');
+
+  function clearAll() {
+    boxes.forEach(function(b) { b.classList.remove('selected'); b.style.opacity = ''; });
+    labels.forEach(function(l) { l.style.textDecoration = ''; });
+    panel.classList.add('empty');
+    panel.style.borderColor = '';
+    titleEl.textContent = '';
+    bodyEl.innerHTML = '← Click a stage or action to see details.';
+  }
+
+  function showDetail(d, highlightStages) {
+    panel.classList.remove('empty');
+    panel.style.borderColor = d.color;
+    titleEl.textContent = d.title;
+    titleEl.style.color = d.color;
+    bodyEl.textContent = d.body;
+    if (highlightStages) {
+      boxes.forEach(function(b) {
+        if (highlightStages.indexOf(b.dataset.stage) >= 0) {
+          b.classList.add('selected');
+          b.style.opacity = '';
+        } else {
+          b.classList.remove('selected');
+          b.style.opacity = '0.3';
+        }
+      });
+    }
+  }
+
+  boxes.forEach(function(el) {
+    el.addEventListener('click', function() {
+      clearAll();
+      var key = el.dataset.stage;
+      var d = info[key];
+      if (!d) return;
+      boxes.forEach(function(b) { b.style.opacity = ''; b.classList.remove('selected'); });
+      el.classList.add('selected');
+      showDetail(d, null);
+    });
+  });
+
+  labels.forEach(function(el) {
+    el.addEventListener('click', function() {
+      clearAll();
+      var key = el.dataset.action;
+      var d = actions[key];
+      if (!d) return;
+      el.style.textDecoration = 'underline';
+      showDetail(d, d.stages);
+    });
+  });
+})();
+</script>
+</body>
+</html>

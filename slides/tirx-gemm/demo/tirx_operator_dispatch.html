@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIRx: Deterministic Op Dispatch over Tiles</title>
+<link rel="stylesheet" href="../viz-base.css">
+<link rel="stylesheet" href="../code-highlight.css">
+<script src="../code-highlight.js"></script>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0.5rem 1rem;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  pre.code-panel {
+    margin: 0;
+    max-height: 70vh;
+    overflow: auto;
+    padding: 1rem 1.2rem;
+    font-size: 10.5px;
+    line-height: 1.4;
+    tab-size: 4;
+    white-space: pre;
+  }
+
+  /* Info panel */
+  .info-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .info-border {
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin: -1rem -1rem 0.2rem -1rem;
+    transition: background 0.2s;
+    background: var(--border);
+  }
+
+  .tabs { display: grid; gap: 0.45rem; }
+
+  .tab {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #0f172a;
+    font: inherit;
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .tab:hover { border-color: #94a3b8; background: #f1f5f9; }
+  .tab.active { background: #eef2ff; border-color: #6366f1; color: #1e1b4b; }
+
+  .tab-num {
+    display: inline-flex; width: 22px; height: 22px;
+    align-items: center; justify-content: center;
+    border-radius: 999px; font-size: 0.78rem; font-weight: 700;
+    background: #e2e8f0; color: #334155;
+  }
+  .tab.active .tab-num { background: #6366f1; color: #fff; }
+
+  .tab-text { font-size: 0.84rem; font-weight: 600; line-height: 1.2; }
+
+  .info-title { font-size: 1.08rem; font-weight: 600; margin: 0 0 0.45rem 0; color: #1e293b; }
+  .info-body { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+</style>
+</head>
+<body>
+  <main class="layout">
+    <section>
+      <div class="cb-panel dark">
+        <div class="cb-header">TIRx: Deterministic Op Dispatch over Tiles</div>
+        <pre id="code-container" class="code-dark code-panel"></pre>
+      </div>
+    </section>
+
+    <aside class="info-panel" id="info-panel">
+      <div class="info-border" id="info-border"></div>
+      <div class="tabs" role="tablist">
+        <button class="tab" type="button" role="tab" data-tab="layout">
+          <span class="tab-num">1</span>
+          <span class="tab-text">Explicit layout on tensors</span>
+        </button>
+        <button class="tab" type="button" role="tab" data-tab="scopes">
+          <span class="tab-num">2</span>
+          <span class="tab-text">Execution scopes</span>
+        </button>
+        <button class="tab" type="button" role="tab" data-tab="operators">
+          <span class="tab-num">3</span>
+          <span class="tab-text">Deterministic operator dispatch over tiles</span>
+        </button>
+      </div>
+      <h3 class="info-title" id="info-title"></h3>
+      <div class="info-body" id="info-body"></div>
+    </aside>
+  </main>
+
+<script>
+var code = String.raw`A_layout = Tx.ComposeLayout(
+    Tx.SwizzleLayout(3, 3, 3, swizzle_inner=True),
+    Tx.TileLayout(Tx.S[(128, 1, 64) : (64, 128 * 64, 1)]),
+)
+B_layout = Tx.ComposeLayout(
+    Tx.SwizzleLayout(3, 3, 3, swizzle_inner=True),
+    Tx.TileLayout(Tx.S[(128, 1, 64) : (64, 128 * 64, 1)]),
+)
+Dreg_layout = TileLayout(Tx.S[(128, 128) : (1@Tx.tid_in_wg, 1@Tx.TCol)])
+
+@Tx.prim_func(tirx=True)
+def gemm_fp16(A, B, D):
+  with Tx.kernel():
+    bx, by = Tx.cta_id([...], parent="kernel")
+    wg_id = Tx.warpgroup_id([1], parent="cta")
+    warp_id = Tx.warp_id([4], parent="warpgroup")
+    lane_id = Tx.thread_id([32], parent="warp")
+
+    pool = Tx.PoolAllocator()
+    Asmem = pool.alloc((128,64), "float16", layout=A_layout)
+    Bsmem = pool.alloc((128,64), "float16", layout=B_layout)
+    pool.commit()
+    Tx.ptx.tcgen05.alloc(tmem_addr, n_cols=512)
+
+    with Tx.cta():              # all 128 threads
+      Tx.copy(Asmem[:,:], A[:, :])
+      Tx.copy(Bsmem[:,:], B[:, :])
+    Tx.cuda.cta_sync()
+
+    with Tx.thread()[Tx.elect_sync()]:  # 1 thread
+      Tx.gemm_async(tmem[:,:], Asmem[:,:], Bsmem[:,:], accum=False, dispatch="tcgen05", cta_group=1)
+      Tx.ptx.tcgen05.commit(mma_bar, cta_group=1)
+    Tx.ptx.mbarrier.try_wait(mma_bar, phase)
+
+    # write back
+    Dreg_thr = Tx.alloc_local((128), "float32")
+    Dreg_f16_thr = Tx.alloc_local((128), "float16")
+    Dreg_wg = Dreg_thr.view(128, 128, layout=Dreg_layout)
+    Dreg_f16_wg = Dreg_f16_thr.view(128, 128, layout=Dreg_layout)
+    with Tx.warpgroup():       # 128 threads
+      Tx.copy(Dreg_wg[:, :], tmem[:,:])
+      Tx.cast(Dreg_f16_wg[:, :], Dreg_wg[:, :])
+      Tx.copy(D[:, :], Dreg_f16_wg[:, :])`;
+
+(function () {
+  'use strict';
+
+  // Render plain highlighted code (no blockDefs)
+  createCodeBlock(document.getElementById('code-container'), code);
+
+  var data = {
+    layout: {
+      label: '1. Explicit layout on tensors',
+      color: '#3b82f6',
+      body: 'Layout (swizzle + tile) attached to each tensor determines logical-to-physical mapping, provide efficient access to certain tile-slice patterns.',
+      focusLines: [1,2,3,4,5,6,7,8,9, 20,21, 38,39],
+      focusColor: 'rgba(59,130,246,0.20)'
+    },
+    operators: {
+      label: '3. Deterministic operator dispatch over tiles',
+      color: '#059669',
+      body: 'Tile-level operators (Tx.copy, Tx.gemm_async, Tx.cast) on tensor tile slices, matching high-level reasoning. They are deterministically dispatched to low-level PTX based on layout, slice and execution scope.',
+      focusLines: [26,27, 31, 41,42,43],
+      focusColor: 'rgba(5,150,105,0.20)'
+    },
+    scopes: {
+      label: '2. Execution scopes',
+      color: '#8b5cf6',
+      body: 'Execution scopes are explicit (kernel/CTA/warpgroup/warp/thread via Tx.cta()/Tx.warpgroup()/Tx.thread()), defining exactly which thread group executes each operator.',
+      focusLines: [13, 25, 30, 40],
+      focusColor: 'rgba(139,92,246,0.25)'
+    }
+  };
+
+  var container = document.getElementById('code-container');
+  var border = document.getElementById('info-border');
+  var titleEl = document.getElementById('info-title');
+  var bodyEl = document.getElementById('info-body');
+  var tabs = document.querySelectorAll('.tab');
+  var allLines = container.querySelectorAll('.cb-line');
+  var activeKey = '';
+
+  function clearFocus() {
+    for (var i = 0; i < allLines.length; i++) {
+      allLines[i].classList.remove('cb-focus');
+      allLines[i].style.background = '';
+    }
+  }
+
+  function applyFocus(lns, color) {
+    for (var i = 0; i < lns.length; i++) {
+      var el = container.querySelector('.cb-line[data-ln="' + lns[i] + '"]');
+      if (el) { el.classList.add('cb-focus'); el.style.background = color; }
+    }
+  }
+
+  function selectTab(key) {
+    if (!data[key] || key === activeKey) return;
+    activeKey = key;
+    tabs.forEach(function (tab) { tab.classList.toggle('active', tab.dataset.tab === key); });
+    clearFocus();
+    applyFocus(data[key].focusLines, data[key].focusColor);
+    border.style.background = data[key].color;
+    titleEl.textContent = data[key].label;
+    titleEl.style.color = data[key].color;
+    bodyEl.textContent = data[key].body;
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () { selectTab(tab.dataset.tab); });
+  });
+
+  selectTab('layout');
+})();
+</script>
+</body>
+</html>

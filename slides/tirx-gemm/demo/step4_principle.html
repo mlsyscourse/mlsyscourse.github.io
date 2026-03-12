@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMA: Hardware Data Mover</title>
+<link rel="stylesheet" href="../viz-base.css">
+<link rel="stylesheet" href="../code-highlight.css">
+<script src="../viz-base.js"></script>
+<script src="../code-highlight.js"></script>
+<style>
+  body { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
+
+  /* ── Top row: side-by-side panels ─────────────────────── */
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto 24px;
+  }
+  .cmp-panel {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+  }
+  .cmp-header {
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cmp-header.red   { background: #ef4444; }
+  .cmp-header.green { background: #059669; }
+  .cmp-body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+  /* Thread squares */
+  .thread-row { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; }
+  .tsq {
+    width: 12px; height: 12px; border-radius: 2px; background: #9ca3af; flex-shrink: 0;
+  }
+  .tsq.elected { background: #059669; }
+  .tsq.free    { background: #d1d5db; }
+  .thread-label {
+    font-size: 10px; color: var(--dim); margin-left: 6px; font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Arrow connectors (pure CSS) */
+  .arrow-area { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .arrow-col {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .arrow-shaft { width: 2px; height: 18px; background: #6b7280; }
+  .arrow-shaft.green-a { background: #059669; }
+  .arrow-shaft.wide { width: 24px; height: 18px; border-radius: 2px; background: #3b82f6; }
+  .arrow-head {
+    width: 0; height: 0;
+    border-left: 5px solid transparent; border-right: 5px solid transparent;
+    border-top: 6px solid #6b7280;
+  }
+  .arrow-head.green-a { border-top-color: #059669; }
+  .arrow-head.wide { border-left-width: 10px; border-right-width: 10px; border-top: 8px solid #3b82f6; }
+
+  .arrows-sync {
+    display: flex; gap: 2px; padding: 4px 0; justify-content: center;
+  }
+
+  /* Hardware block */
+  .hw-block {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px;
+    padding: 6px 12px; font-size: 12px; font-weight: 700; color: #1e40af;
+  }
+
+  .smem-block {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #f3f4f6; border: 2px solid var(--border); border-radius: 6px;
+    padding: 5px 14px; font-size: 11px; font-weight: 700; color: var(--dim);
+  }
+
+  /* TMA diagram layout */
+  .tma-diagram {
+    display: flex; align-items: center; gap: 8px; justify-content: center;
+    padding: 4px 0;
+  }
+  .tma-diagram .arrow-horiz {
+    width: 24px; height: 2px; background: #059669; position: relative;
+  }
+  .tma-diagram .arrow-horiz::after {
+    content: ''; position: absolute; right: -5px; top: -4px;
+    border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+    border-left: 6px solid #059669;
+  }
+  .tma-diagram .arrow-horiz.blue { background: #3b82f6; }
+  .tma-diagram .arrow-horiz.blue::after { border-left-color: #3b82f6; }
+
+  .free-group {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 6px;
+  }
+  .free-group .thread-row { opacity: .5; }
+  .free-label {
+    font-size: 11px; color: #059669; font-weight: 600; white-space: nowrap;
+  }
+
+  /* Timeline bars */
+  .timeline { margin-top: auto; }
+  .timeline-label {
+    font-size: 10px; font-weight: 600; color: var(--dim); margin-bottom: 4px;
+  }
+  .timeline-track {
+    height: 22px; border-radius: 4px; background: #f3f4f6; overflow: hidden;
+    position: relative;
+  }
+  .timeline-fill {
+    height: 100%; border-radius: 4px; display: flex; align-items: center;
+    padding-left: 8px; font-size: 10px; font-weight: 700; color: #fff;
+  }
+  .timeline-fill.red   { background: #ef4444; width: 100%; }
+  .timeline-fill.green { background: #059669; width: 8%; }
+  .timeline-caption {
+    font-size: 10px; color: var(--dim); margin-top: 3px; text-align: center;
+    font-style: italic;
+  }
+
+  /* Code snippets */
+  .cmp-code {
+    font-family: 'SF Mono','Fira Code',monospace;
+    font-size: 11.5px; line-height: 1.6;
+    border-radius: 6px; padding: 8px 10px;
+    color: var(--text);
+  }
+  .cmp-result {
+    font-size: 12px; font-weight: 700; text-align: center; padding: 4px 0;
+  }
+  .cmp-result.red   { color: #ef4444; }
+  .cmp-result.green { color: #059669; }
+
+  /* Thread detail labels */
+  .thread-detail {
+    display: flex; gap: 10px; flex-wrap: wrap; padding: 2px 0;
+  }
+  .td-item {
+    font-size: 10px; color: #6b7280; font-family: 'SF Mono','Fira Code',monospace;
+  }
+
+  /* ── Bottom row: mbarrier flow ────────────────────────── */
+  .mbar-section {
+    max-width: 1100px; margin: 0 auto;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    padding: 18px 20px;
+  }
+  .mbar-title {
+    font-size: 14px; font-weight: 700; text-align: center;
+    margin-bottom: 14px; color: var(--text);
+  }
+  .flow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0px; flex-wrap: nowrap; overflow-x: auto; padding: 4px 0;
+  }
+  .flow-box {
+    padding: 10px 12px; border-radius: 8px; font-size: 11.5px; font-weight: 600;
+    text-align: center; white-space: nowrap; line-height: 1.35;
+    border: 2px solid transparent; flex-shrink: 0;
+  }
+  .flow-box.thread-action {
+    background: #ecfdf5; border-color: #059669; color: #065f46;
+  }
+  .flow-box.hw-action {
+    background: #eff6ff; border-color: #3b82f6; color: #1e40af;
+  }
+  .flow-box.sync-point {
+    background: #fffbeb; border-color: #d97706; color: #92400e;
+  }
+  .flow-arrow {
+    display: flex; align-items: center; flex-shrink: 0; padding: 0 2px;
+  }
+  .flow-arrow svg { width: 28px; height: 16px; }
+
+  @keyframes pulse-hw {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,.3); }
+    50%      { box-shadow: 0 0 0 6px rgba(59,130,246,0); }
+  }
+  .flow-box.hw-action.pulse {
+    animation: pulse-hw 2s ease-in-out infinite;
+  }
+
+  .mbar-callout {
+    margin-top: 14px; padding: 10px 14px;
+    background: #fffbeb; border-left: 4px solid #d97706;
+    border-radius: 0 8px 8px 0;
+    font-size: 12.5px; line-height: 1.55; color: #78350f;
+  }
+  .mbar-callout strong { color: #92400e; }
+
+  /* ── Animations ───────────────────────────────────────── */
+  @keyframes copy-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .55; }
+  }
+  .sync-busy { animation: copy-pulse 1.5s ease-in-out infinite; }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .cmp-panel { animation: slide-in .4s ease both; }
+  .cmp-panel:nth-child(2) { animation-delay: .15s; }
+  .mbar-section { animation: slide-in .4s ease .3s both; }
+
+  @media(max-width:800px) {
+    .compare-row { grid-template-columns: 1fr; }
+    .flow { flex-wrap: wrap; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+  <h1>TMA: Hardware Data Mover</h1>
+  <p class="sub">Dedicated engine for bulk data transfers — frees threads for compute</p>
+
+  <!-- ═══════ TOP ROW: side-by-side ═══════ -->
+  <div class="compare-row">
+
+    <!-- LEFT: Synchronous Copy -->
+    <div class="cmp-panel">
+      <div class="cmp-header red">Synchronous Copy (Step 1)</div>
+      <div class="cmp-body">
+
+        <div>
+          <div class="thread-row sync-busy" id="sync-threads"></div>
+          <div class="thread-detail">
+            <span class="td-item">Thread 0: copy 128B</span>
+            <span class="td-item">Thread 1: copy 128B</span>
+            <span class="td-item">Thread 2: copy 128B</span>
+            <span class="td-item">…</span>
+            <span class="td-item">Thread 127: copy 128B</span>
+          </div>
+        </div>
+
+        <div class="arrows-sync" id="sync-arrows"></div>
+        <div style="text-align:center;"><div class="smem-block">SMEM</div></div>
+
+        <pre class="cmp-code code-light auto-hl">with Tx.cta():
+  Tx.copy(Asmem, A[...])</pre>
+
+        <div class="timeline">
+          <div class="timeline-label">Thread Activity</div>
+          <div class="timeline-track">
+            <div class="timeline-fill red">all 128 threads copying</div>
+          </div>
+          <div class="timeline-caption">All 128 threads blocked on data movement</div>
+        </div>
+
+        <div class="cmp-result red">128 threads × sequential loads = slow</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: TMA Async -->
+    <div class="cmp-panel">
+      <div class="cmp-header green">TMA Async (Step 4)</div>
+      <div class="cmp-body">
+
+        <div class="tma-diagram">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div class="tsq elected"></div>
+            <span style="font-size:9px;color:#059669;font-weight:700;">elected</span>
+          </div>
+          <div class="arrow-horiz"></div>
+          <div class="hw-block">⚙ TMA Engine</div>
+          <div class="arrow-horiz blue"></div>
+          <div class="smem-block">SMEM</div>
+        </div>
+
+        <div class="free-group">
+          <div class="thread-row" id="free-threads"></div>
+          <span class="free-label">💤 127 threads free for compute</span>
+        </div>
+
+        <pre class="cmp-code code-light auto-hl">Tx.copy_async(Asmem, A[...], dispatch="tma")</pre>
+
+        <div class="timeline">
+          <div class="timeline-label">Thread Activity</div>
+          <div class="timeline-track">
+            <div class="timeline-fill green">issue</div>
+          </div>
+          <div class="timeline-caption">1 thread issues, hardware engine executes</div>
+        </div>
+
+        <div class="cmp-result green">1 thread + HW engine = saturate bandwidth</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ BOTTOM ROW: mbarrier protocol ═══════ -->
+  <div class="mbar-section">
+    <div class="mbar-title">mbarrier: TMA Completion Tracking</div>
+
+    <div class="flow">
+      <div class="flow-box thread-action">elect_sync()</div>
+      <div class="flow-arrow"><svg viewBox="0 0 28 16"><path d="M2 8 H22" stroke="#059669" stroke-width="2" fill="none"/><polygon points="20,4 26,8 20,12" fill="#059669"/></svg></div>
+
+      <div class="flow-box thread-action">copy_async<br><small>issue TMA</small></div>
+      <div class="flow-arrow"><svg viewBox="0 0 28 16"><path d="M2 8 H22" stroke="#059669" stroke-width="2" fill="none"/><polygon points="20,4 26,8 20,12" fill="#059669"/></svg></div>
+
+      <div class="flow-box sync-point">arrive.expect_tx<br><small>(byte_count)</small></div>
+      <div class="flow-arrow"><svg viewBox="0 0 28 16"><path d="M2 8 H22" stroke="#3b82f6" stroke-width="2" fill="none"/><polygon points="20,4 26,8 20,12" fill="#3b82f6"/></svg></div>
+
+      <div class="flow-box hw-action pulse">TMA Engine<br>working…</div>
+      <div class="flow-arrow"><svg viewBox="0 0 28 16"><path d="M2 8 H22" stroke="#d97706" stroke-width="2" fill="none"/><polygon points="20,4 26,8 20,12" fill="#d97706"/></svg></div>
+
+      <div class="flow-box sync-point">try_wait<br><small>(phase)</small></div>
+      <div class="flow-arrow"><svg viewBox="0 0 28 16"><path d="M2 8 H22" stroke="#059669" stroke-width="2" fill="none"/><polygon points="20,4 26,8 20,12" fill="#059669"/></svg></div>
+
+      <div class="flow-box thread-action">Data in SMEM ✓</div>
+    </div>
+
+    <div class="mbar-callout">
+      <strong>Key insight:</strong> mbarrier tracks <strong>expected bytes</strong>, not thread arrivals.
+      The TMA engine arrives with the byte count when the transfer completes.
+    </div>
+  </div>
+
+<script>
+(function() {
+  /* Generate 128 thread squares for the sync panel */
+  var syncRow = document.getElementById('sync-threads');
+  for (var i = 0; i < 128; i++) {
+    var sq = document.createElement('div');
+    sq.className = 'tsq';
+    sq.title = 'Thread ' + i;
+    syncRow.appendChild(sq);
+  }
+
+  /* Generate small arrow shafts under sync threads (show ~16 representative arrows) */
+  var arrowsDiv = document.getElementById('sync-arrows');
+  for (var j = 0; j < 16; j++) {
+    var col = document.createElement('div');
+    col.className = 'arrow-col';
+    var shaft = document.createElement('div');
+    shaft.className = 'arrow-shaft';
+    var head = document.createElement('div');
+    head.className = 'arrow-head';
+    col.appendChild(shaft);
+    col.appendChild(head);
+    arrowsDiv.appendChild(col);
+  }
+
+  /* Generate 127 free-thread squares for the async panel */
+  var freeRow = document.getElementById('free-threads');
+  for (var k = 0; k < 127; k++) {
+    var sq2 = document.createElement('div');
+    sq2.className = 'tsq free';
+    sq2.title = 'Thread ' + (k + 1) + ' (idle)';
+    freeRow.appendChild(sq2);
+  }
+})();
+</script>
+</body>
+</html>

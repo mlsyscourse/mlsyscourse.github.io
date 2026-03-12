@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core APIs at a Glance</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 20px 28px; max-width: 1200px; margin: 0 auto; }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 14px; margin-top: 12px;
+  }
+  thead th {
+    text-align: left; padding: 10px 14px;
+    border-bottom: 2.5px solid var(--text);
+    font-weight: 700; font-size: 13px;
+    text-transform: uppercase; letter-spacing: .04em;
+    color: #374151;
+  }
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top; line-height: 1.5;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f9fafb; }
+
+  td:first-child {
+    font-weight: 700; color: #1e293b;
+    white-space: nowrap; width: 100px;
+  }
+  td code {
+    font-family: 'SF Mono','Fira Code',monospace;
+    font-size: 13px; background: #f1f5f9;
+    padding: 1px 5px; border-radius: 3px; color: #1e40af;
+  }
+  td:last-child {
+    color: #6b7280; font-size: 13px;
+  }
+  .sep { color: #9ca3af; padding: 0 2px; }
+</style>
+</head>
+<body>
+  <h1>Core APIs at a Glance</h1>
+  <p class="sub">TIRx API → hardware mapping</p>
+
+  <table>
+    <thead>
+      <tr><th>Category</th><th>API</th><th>Maps to</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Memory</td>
+        <td><code>pool.alloc</code> <span class="sep">·</span> <code>tcgen05.alloc/dealloc</code> <span class="sep">·</span> <code>tma_shared_layout</code></td>
+        <td>SMEM, TMEM, swizzled layout</td>
+      </tr>
+      <tr>
+        <td>Scope</td>
+        <td><code>Tx.kernel / cta / warpgroup / thread</code> <span class="sep">·</span> <code>elect_sync()</code></td>
+        <td>Execution hierarchy</td>
+      </tr>
+      <tr>
+        <td>Data Move</td>
+        <td><code>Tx.copy</code> <span class="sep">·</span> <code>Tx.copy_async(dispatch="tma")</code></td>
+        <td>Sync copy, TMA bulk tensor</td>
+      </tr>
+      <tr>
+        <td>Compute</td>
+        <td><code>Tx.gemm_async(dispatch="tcgen05")</code> <span class="sep">·</span> <code>Tx.cast</code></td>
+        <td><code>tcgen05.mma</code>, type conversion</td>
+      </tr>
+      <tr>
+        <td>Sync</td>
+        <td><code>TMABar</code> <span class="sep">·</span> <code>TCGen05Bar</code> <span class="sep">·</span> <code>MBarrier</code> <span class="sep">·</span> <code>PipelineState</code></td>
+        <td>Barrier abstractions, pipeline</td>
+      </tr>
+      <tr>
+        <td>Schedule</td>
+        <td><code>ClusterPersistentScheduler2D</code></td>
+        <td>Persistent tile scheduling</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

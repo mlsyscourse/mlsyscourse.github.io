@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axe Layout: Core Idea</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 20px 28px; max-width: 1300px; margin: 0 auto; }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin: 24px auto 20px; max-width: 1200px;
+  }
+  .step-card {
+    border: 2px solid; border-radius: 12px;
+    padding: 18px 16px; text-align: center;
+    position: relative; transition: transform .2s ease, box-shadow .2s ease;
+    cursor: default;
+  }
+  .step-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.1);
+  }
+  .step-num {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: #fff;
+  }
+  .step-icon { font-size: 28px; margin-bottom: 8px; }
+  .step-title {
+    font-size: 14px; font-weight: 700; margin-bottom: 6px;
+  }
+  .step-desc {
+    font-size: 11.5px; line-height: 1.55; color: #475569;
+  }
+  .step-code {
+    margin-top: 8px; padding: 6px 8px; border-radius: 6px;
+    font-family: 'SF Mono','Fira Code',monospace;
+    font-size: 11px; line-height: 1.5; text-align: left;
+  }
+
+  .s1 { border-color: #3b82f6; background: #eff6ff; }
+  .s1 .step-num { background: #3b82f6; }
+  .s1 .step-title { color: #1e40af; }
+  .s1 .step-code { background: #dbeafe; color: #1e40af; }
+
+  .s2 { border-color: #059669; background: #ecfdf5; }
+  .s2 .step-num { background: #059669; }
+  .s2 .step-title { color: #065f46; }
+  .s2 .step-code { background: #d1fae5; color: #065f46; }
+
+  .s3 { border-color: #d97706; background: #fffbeb; }
+  .s3 .step-num { background: #d97706; }
+  .s3 .step-title { color: #92400e; }
+
+  .s4 { border-color: #7c3aed; background: #f5f3ff; }
+  .s4 .step-num { background: #7c3aed; }
+  .s4 .step-title { color: #5b21b6; }
+  .s4 .step-code { background: #ede9fe; color: #5b21b6; }
+
+  .arrows-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin: -8px auto 0; max-width: 1200px;
+    padding: 0 60px;
+  }
+  .arrow-spacer { flex: 1; }
+  .arrow-between {
+    flex-shrink: 0;
+  }
+  .arrow-between svg { width: 32px; height: 20px; }
+
+  .callout {
+    max-width: 1200px; margin: 20px auto 0;
+    padding: 12px 16px;
+    background: #f8fafc; border: 1px solid var(--border);
+    border-radius: 10px; font-size: 13px; line-height: 1.65;
+    color: #334155; text-align: center;
+  }
+  .callout strong { color: #1e293b; }
+  .callout code {
+    font-family: 'SF Mono','Fira Code',monospace; font-size: 12px;
+    background: #e2e8f0; padding: 1px 5px; border-radius: 3px;
+  }
+
+  @media(max-width:900px) {
+    .steps { grid-template-columns: 1fr 1fr; }
+    .arrows-row { display: none; }
+  }
+</style>
+</head>
+<body>
+  <h1>Axe Layout: Core Idea</h1>
+  <p class="sub">Declare layout once → operate on logical tiles → compiler handles the rest</p>
+
+  <div class="steps">
+    <div class="step-card s1">
+      <div class="step-num">1</div>
+      <div class="step-icon">📐</div>
+      <div class="step-title">Declare Buffer with Layout</div>
+      <div class="step-desc">Bind a <strong>physical layout</strong> to each buffer at allocation time. Layout encodes axes, swizzle, and memory mapping.</div>
+      <div class="step-code">
+Asmem = pool.alloc(<br>
+&nbsp;&nbsp;(128, 64), "fp16",<br>
+&nbsp;&nbsp;layout=<strong>tma_shared_layout(...)</strong>)
+      </div>
+    </div>
+
+    <div class="step-card s2">
+      <div class="step-num">2</div>
+      <div class="step-icon">🧩</div>
+      <div class="step-title">Operate on Tiles</div>
+      <div class="step-desc">Write high-level tile operations using <strong>logical coordinates</strong>. Slicing, copying, and MMA all work on tile views.</div>
+      <div class="step-code">
+Tx.copy_async(Asmem, A[m:m+128, k:k+64])<br>
+Tx.gemm_async(tmem, <strong>Asmem</strong>, <strong>Bsmem</strong>)
+      </div>
+    </div>
+
+    <div class="step-card s3">
+      <div class="step-num">3</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-title">Fast Access Guaranteed</div>
+      <div class="step-desc">Layout ensures <strong>bank-conflict-free</strong> SMEM access via swizzling, coalesced global loads, and correct TMEM lane mapping — all automatic.</div>
+    </div>
+
+    <div class="step-card s4">
+      <div class="step-num">4</div>
+      <div class="step-icon">🔧</div>
+      <div class="step-title">Deduce Low-Level Instructions</div>
+      <div class="step-desc">Compiler reads the layout to generate correct <strong>PTX instructions</strong> — descriptor encoding, address offsets, swizzle modes.</div>
+      <div class="step-code">
+SmemDescriptor: base | swizzle&lt;&lt;62<br>
+tcgen05.mma [...], a_desc, b_desc, idesc
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Key insight:</strong> You never manually compute addresses or encode descriptors. Write <code>Tx.gemm_async(tmem, Asmem, Bsmem)</code> and the layout tells the compiler everything it needs to emit the right hardware instructions.
+  </div>
+</body>
+</html>

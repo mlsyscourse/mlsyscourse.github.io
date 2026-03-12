@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIRx Kernel Structure</title>
+<link rel="stylesheet" href="../viz-base.css">
+<link rel="stylesheet" href="../code-highlight.css">
+<style>
+  body { padding: 2rem 2.5rem; min-height: 100vh; }
+
+  header { margin-bottom: 1.5rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* ── Code panel ── */
+  .code-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .code-panel pre {
+    margin: 0;
+    padding: 1rem 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    color: var(--text);
+  }
+
+  .region {
+    border-left: 3px solid transparent;
+    padding: 0.35rem 0 0.35rem 0.85rem;
+    margin: 0.15rem 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+  }
+
+  .region:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .region.active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .region[data-region="scope"]        { border-left-color: #6b7280; }
+  .region[data-region="alloc"]        { border-left-color: #3b82f6; }
+  .region[data-region="load"]         { border-left-color: #60a5fa; }
+  .region[data-region="compute"]      { border-left-color: #059669; }
+  .region[data-region="writeback"]    { border-left-color: #d97706; }
+
+  .region[data-region="scope"]:hover,
+  .region[data-region="scope"].active     { background: rgba(107,114,128,0.10); }
+  .region[data-region="alloc"]:hover,
+  .region[data-region="alloc"].active     { background: rgba(59,130,246,0.10); }
+  .region[data-region="load"]:hover,
+  .region[data-region="load"].active      { background: rgba(96,165,250,0.10); }
+  .region[data-region="compute"]:hover,
+  .region[data-region="compute"].active   { background: rgba(5,150,105,0.10); }
+  .region[data-region="writeback"]:hover,
+  .region[data-region="writeback"].active { background: rgba(217,119,6,0.10); }
+
+  /* ── Non-syntax token (kept local) ── */
+  .var { color: #1e293b; }
+
+  /* ── Info panel ── */
+  .info-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    min-height: 180px;
+    transition: border-color var(--transition);
+    position: sticky;
+    top: 2rem;
+  }
+
+  .info-panel .info-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+    transition: color var(--transition);
+  }
+
+  .info-panel .info-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    transition: color var(--transition);
+  }
+
+  .info-panel .info-body {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .info-panel.empty .info-body {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  .info-border {
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin: -1.5rem -1.5rem 1.25rem -1.5rem;
+    transition: background var(--transition);
+    background: var(--border);
+  }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    body { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TIRx Kernel Structure</h1>
+  <p class="sub">Click a region to see its hardware mapping</p>
+</header>
+
+<div class="grid">
+  <!-- Code panel -->
+  <div class="code-panel">
+    <pre class="code-light"><div class="region" data-region="scope"><span class="dec">@Tx.prim_func</span>(<span class="var">tirx</span><span class="op">=</span><span class="kw">True</span>)
+<span class="kw">def</span> <span class="fn">hgemm</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">D</span>):
+  <span class="kw">with</span> Tx.<span class="fn">kernel</span>():
+    <span class="var">bx</span>, <span class="var">by</span> <span class="op">=</span> Tx.<span class="fn">cta_id</span>([...], <span class="var">parent</span><span class="op">=</span><span class="str">"kernel"</span>)
+    <span class="var">wg_id</span> <span class="op">=</span> Tx.<span class="fn">warpgroup_id</span>([<span class="num">1</span>], <span class="var">parent</span><span class="op">=</span><span class="str">"cta"</span>)
+    <span class="var">warp_id</span> <span class="op">=</span> Tx.<span class="fn">warp_id</span>([<span class="num">4</span>], <span class="var">parent</span><span class="op">=</span><span class="str">"warpgroup"</span>)
+    <span class="var">lane_id</span> <span class="op">=</span> Tx.<span class="fn">thread_id</span>([<span class="num">32</span>], <span class="var">parent</span><span class="op">=</span><span class="str">"warp"</span>)</div><div class="region" data-region="alloc">    <span class="var">pool</span> <span class="op">=</span> Tx.<span class="fn">PoolAllocator</span>()
+    <span class="var">Asmem</span> <span class="op">=</span> <span class="var">pool</span>.<span class="fn">alloc</span>((<span class="num">128</span>,<span class="num">64</span>), <span class="str">"fp16"</span>, <span class="var">layout</span><span class="op">=</span><span class="var">A_layout</span>)
+    <span class="var">Bsmem</span> <span class="op">=</span> <span class="var">pool</span>.<span class="fn">alloc</span>((<span class="num">128</span>,<span class="num">64</span>), <span class="str">"fp16"</span>, <span class="var">layout</span><span class="op">=</span><span class="var">B_layout</span>)
+    <span class="var">pool</span>.<span class="fn">commit</span>()
+    Tx.ptx.tcgen05.<span class="fn">alloc</span>(<span class="var">tmem_addr</span>, <span class="var">n_cols</span><span class="op">=</span><span class="num">512</span>)</div><div class="region" data-region="load">    <span class="kw">with</span> Tx.<span class="fn">cta</span>():              <span class="cmt"># all 128 threads</span>
+      Tx.<span class="fn">copy</span>(<span class="var">Asmem</span>, <span class="var">A</span>[<span class="var">m</span>:<span class="var">m</span>+<span class="num">128</span>, <span class="num">0</span>:<span class="num">64</span>])
+      Tx.<span class="fn">copy</span>(<span class="var">Bsmem</span>, <span class="var">B</span>[<span class="var">n</span>:<span class="var">n</span>+<span class="num">128</span>, <span class="num">0</span>:<span class="num">64</span>])
+    Tx.cuda.<span class="fn">cta_sync</span>()</div><div class="region" data-region="compute">    <span class="kw">with</span> Tx.<span class="fn">thread</span>()[<span class="fn">elect_sync</span>()]:  <span class="cmt"># 1 thread</span>
+      Tx.<span class="fn">gemm_async</span>(<span class="var">tmem</span>, <span class="var">Asmem</span>, <span class="var">Bsmem</span>,
+          <span class="var">accum</span><span class="op">=</span><span class="kw">False</span>, <span class="var">dispatch</span><span class="op">=</span><span class="str">"tcgen05"</span>)
+      Tx.ptx.tcgen05.<span class="fn">commit</span>(<span class="var">mma_bar</span>, <span class="var">cta_group</span><span class="op">=</span><span class="num">1</span>)
+    Tx.ptx.mbarrier.<span class="fn">try_wait</span>(<span class="var">mma_bar</span>, <span class="var">phase</span>)</div><div class="region" data-region="writeback">    <span class="kw">with</span> Tx.<span class="fn">warpgroup</span>():       <span class="cmt"># 128 threads</span>
+      Tx.<span class="fn">copy</span>(<span class="var">Dreg_wg</span>, <span class="var">tmem</span>[<span class="op">:</span>,<span class="op">:</span><span class="var">BLK_N</span>])
+    <span class="kw">with</span> Tx.<span class="fn">thread</span>():           <span class="cmt"># per thread</span>
+      Tx.<span class="fn">cast</span>(<span class="var">Dreg_f16</span>, <span class="var">Dreg</span>)
+      Tx.<span class="fn">copy</span>(<span class="var">D</span>[<span class="var">m_thr</span>, <span class="var">n</span>:<span class="var">n</span>+<span class="var">BLK_N</span>], <span class="var">Dreg_f16</span>)</div></pre>
+  </div>
+
+  <!-- Info panel -->
+  <div class="info-panel empty" id="info-panel">
+    <div class="info-border" id="info-border"></div>
+    <div class="info-label" id="info-label">Hardware Mapping</div>
+    <div class="info-title" id="info-title"></div>
+    <div class="info-body" id="info-body">
+      ← Click a highlighted region in the code to learn about its hardware mapping.
+    </div>
+  </div>
+</div>
+
+<script src="../viz-base.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var data = {
+    scope: {
+      label: 'Scope Hierarchy',
+      color: '#6b7280',
+      body: 'kernel → CTA → warpgroup → warp → thread. parent= declares the nesting. Each scope maps to a hardware unit and controls which threads execute the enclosed code.'
+    },
+    alloc: {
+      label: 'Memory Allocation',
+      color: '#3b82f6',
+      body: 'PoolAllocator manages SMEM as a flat byte buffer with Axe Layout. pool.commit() finalizes the layout. tcgen05.alloc reserves TMEM columns for the accumulator.'
+    },
+    load: {
+      label: 'Load — with Tx.cta()',
+      color: '#60a5fa',
+      body: 'All 128 threads in the CTA participate in copying GMEM → SMEM via Tx.copy (sync). cta_sync() ensures all threads finish before proceeding.'
+    },
+    compute: {
+      label: 'Compute — with Tx.thread()[elect_sync()]',
+      color: '#059669',
+      body: 'A single elected thread issues tcgen05.mma and commits to barrier. All other threads skip. mbarrier.try_wait blocks until MMA completes.'
+    },
+    writeback: {
+      label: 'Writeback — warpgroup + thread scopes',
+      color: '#d97706',
+      body: 'with Tx.warpgroup(): all 128 threads read TMEM → registers via tcgen05.ld. with Tx.thread(): each thread casts fp32→fp16 and stores to GMEM.'
+    }
+  };
+
+  var panel      = document.getElementById('info-panel');
+  var border     = document.getElementById('info-border');
+  var titleEl    = document.getElementById('info-title');
+  var bodyEl     = document.getElementById('info-body');
+  var regions    = document.querySelectorAll('.region');
+  var activeKey  = null;
+
+  regions.forEach(function (el) {
+    el.addEventListener('click', function () {
+      var key = el.dataset.region;
+      if (key === activeKey) return;
+      activeKey = key;
+
+      regions.forEach(function (r) { r.classList.remove('active'); });
+      el.classList.add('active');
+
+      var info = data[key];
+      panel.classList.remove('empty');
+      border.style.background = info.color;
+      titleEl.textContent = info.label;
+      titleEl.style.color = info.color;
+      bodyEl.textContent = info.body;
+    });
+  });
+})();
+</script>
+</body>
+</html>
