@@ -165,7 +165,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 10: <strong>LLM Serving (Speculative Decoding)</strong>
-  slides:
+  slides: /slides/15-LLM-serving-part2.pdf
   notes:
   readings:
   logistics:
