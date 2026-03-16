@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step 9: 2-CTA Cluster — Code</title>
+<link rel="stylesheet" href="../viz-base.css">
+<link rel="stylesheet" href="../code-highlight.css">
+<script src="../viz-base.js"></script>
+<script src="../code-highlight.js"></script>
+<style>
+  body { padding: 20px 28px; max-width: 1440px; margin: 0 auto; }
+
+  /* ── Barrier header ── */
+  .barrier-decls {
+    background: #1e1e2e; border-radius: 8px; padding: 12px 18px;
+    font-family: 'SF Mono','Fira Code',monospace; font-size: 12px;
+    line-height: 1.75; color: #c4c8d8; margin-bottom: 14px;
+    border: 1px solid var(--border); white-space: pre-wrap;
+  }
+  .barrier-decls .arrow-icon {
+    display: inline-block; width: 18px; height: 12px; margin-right: 4px;
+    vertical-align: middle; position: relative; top: -1px;
+  }
+  .barrier-decls .hl  { background: #0f3d1c; display: block; padding: 0 2px; border-radius: 2px; }
+
+  /* ── Three-column code grid ── */
+  .code-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .code-col {
+    border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--border); background: #1e1e2e;
+    display: flex; flex-direction: column;
+  }
+  .code-header {
+    padding: 7px 12px; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.02em; text-align: center;
+  }
+  .code-header.tma  { background: rgba(59,130,246,0.22); color: #93bbfc; }
+  .code-header.mma  { background: rgba(5,150,105,0.22); color: #6ee7b7; }
+  .code-header.wb   { background: rgba(217,119,6,0.22); color: #fbbf24; }
+  .code-body {
+    padding: 10px 12px; font-family: 'SF Mono','Fira Code',monospace;
+    font-size: 11px; line-height: 1.7; color: #c4c8d8;
+    white-space: pre; overflow-x: auto; flex: 1;
+    max-height: 300px; overflow-y: auto;
+  }
+  .code-body .hl  { background: #0f3d1c; display: block; padding: 0 2px; border-radius: 2px; }
+  .code-body .hl::before { content: "▸"; color: #34d399; margin-right: 2px; font-size: 9px; }
+
+  /* ── Summary bar ── */
+  .summary-bar {
+    padding: 10px 16px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    font-size: 12px; line-height: 1.5;
+    font-family: 'SF Mono','Fira Code',monospace;
+    color: var(--accent); text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>Step 9: 2-CTA Cluster &mdash; Code</h1>
+<p class="sub">Same three-role structure as Step 7 &mdash; only highlighted lines change</p>
+
+<!-- ════ Barrier Declarations ════ -->
+<div class="barrier-decls code-dark" id="barrier-decls-9"></div>
+
+<!-- ════ Three-Column Warp Roles ════ -->
+<div class="code-grid">
+
+  <!-- Column 1: TMA Producer -->
+  <div class="code-col">
+    <div class="code-header tma">TMA Producer (WG1/warp3)</div>
+    <div class="code-body code-dark" id="col-tma-9"></div>
+  </div>
+
+  <!-- Column 2: MMA Consumer -->
+  <div class="code-col">
+    <div class="code-header mma">MMA Consumer (WG1/warp0)</div>
+    <div class="code-body code-dark" id="col-mma-9"></div>
+  </div>
+
+  <!-- Column 3: Writeback -->
+  <div class="code-col">
+    <div class="code-header wb">Writeback (WG0)</div>
+    <div class="code-body code-dark" id="col-wb-9"></div>
+  </div>
+
+</div>
+
+<!-- ════ Summary Bar ════ -->
+<div class="summary-bar">
+  Key changes: CTA_GROUP=2 · remote_view(0) for cross-CTA barrier · cbx==0 guards · cta_mask=1→3 · cluster_sync
+</div>
+
+<script>
+(function () {
+  var svgArrow = function(color) {
+    return '<svg class="arrow-icon" viewBox="0 0 18 12"><line x1="1" y1="6" x2="14" y2="6" stroke="' + color + '" stroke-width="2"/><polygon points="14,3 18,6 14,9" fill="' + color + '"/></svg>';
+  };
+  var barriers = [
+    ['tma2mma = TMABar(pool, PIPE_DEPTH, "tma2mma")',       '#3b82f6', '# TMA → MMA'],
+    ['mma2tma = TCGen05Bar(pool, PIPE_DEPTH, "mma2tma")',   '#059669', '# MMA → TMA'],
+    ['mma2ld  = TCGen05Bar(pool, 1, "mma2ld")',             '#059669', '# MMA → Writeback'],
+    ['ld2mma  = MBarrier(pool, 1, "ld2mma")',               '#d97706', '# Writeback → MMA']
+  ];
+  var hlLines = [
+    'CTA_GROUP = 2                                   # NEW',
+    'tma2mma_cta0 = tma2mma.remote_view(0)          # NEW: cross-CTA barrier view',
+    'ld2mma.init(128 * CTA_GROUP)                    # CHANGED: was 128'
+  ];
+  document.getElementById('barrier-decls-9').innerHTML =
+    hlLines.slice(0, 1).map(function(l) { return '<div class="hl">' + highlightCode(l) + '</div>'; }).join('') +
+    barriers.map(function(b) {
+      return highlightCode(b[0]) + '  ' + svgArrow(b[1]) + '<span class="cmt">' + escapeHtml(b[2]) + '</span>';
+    }).join('\n') + '\n' +
+    hlLines.slice(1).map(function(l) { return '<div class="hl">' + highlightCode(l) + '</div>'; }).join('');
+
+  var tmaCode = String.raw`if wg_id == 1 and warp_id == 3:
+    tma_phase = PipelineState("tma", PIPE_DEPTH)
+    tma_phase.init(is_producer=True)
+
+    @Tx.inline
+    def tma_load_stage(stage, k_st):
+        mma2tma.wait(stage, tma_phase.phase)
+        tma_cfg = {"dispatch": "tma", "cta_group": CTA_GROUP,
+                   "mbar": tma2mma_cta0.ptr_to([stage])}
+        Tx.copy_async(Asmem[stage,:,:], A[...], **tma_cfg)
+        Tx.copy_async(Bsmem[stage,:,:], B[...], **tma_cfg)
+        if cbx == 0:
+            tma2mma_cta0.arrive(stage,
+                CTA_GROUP * byte_count)
+
+    @Tx.inline
+    def tma_load():
+        for k in Tx.serial(K_TILES):
+            tma_load_stage(tma_phase.stage, k*BLK_K)
+            tma_phase.move_to_next_stage()
+
+    with Tx.thread(parent="warp")[Tx.ptx.elect_sync()]:
+        while tile_scheduler.valid():
+            tma_load()
+            tile_scheduler.next_tile()`;
+
+  var mmaCode = String.raw`elif warp_id == 0:
+    if cbx == 0:
+        mma_phase = PipelineState("mma", PIPE_DEPTH)
+        mma_phase.init(is_producer=False)
+        ld_phase = PipelineState("ld", 1)
+        ld_phase.init(is_producer=True)
+
+        @Tx.inline
+        def mma_stage(stage):
+            tma2mma.wait(stage, mma_phase.phase)
+            Tx.gemm_async(tmem[:,:MMA_N],
+                Asmem[stage,:,:], Bsmem[stage,:,:],
+                accum=accum, dispatch="tcgen05",
+                cta_group=CTA_GROUP)
+            accum = 1
+            mma2tma.arrive(stage,
+                cta_group=CTA_GROUP, cta_mask=3)
+
+        @Tx.inline
+        def mma():
+            ld2mma.wait(0, ld_phase.phase)
+            ld_phase.move_to_next_stage()
+            accum = 0
+            for k in Tx.serial(K_TILES):
+                mma_stage(mma_phase.stage)
+                mma_phase.move_to_next_stage()
+            mma2ld.arrive(0,
+                cta_group=CTA_GROUP, cta_mask=3)
+
+        with Tx.thread(parent="warp")[Tx.ptx.elect_sync()]:
+            while tile_scheduler.valid():
+                mma()
+                tile_scheduler.next_tile()`;
+
+  var wbCode = String.raw`elif wg_id == 0:
+    wb_phase = PipelineState("wb", 1)
+    wb_phase.init(is_producer=False)
+
+    @Tx.inline
+    def writeback():
+        mma2ld.wait(0, wb_phase.phase)
+        wb_phase.move_to_next_stage()
+        Tx.ptx.tcgen05.fence.after_thread_sync()
+
+        # TMEM → registers (chunked)
+        for no in Tx.unroll(MMA_N // TMEM_LD_N):
+            Dreg = Tx.alloc_local((TMEM_LD_N,), "f32")
+            with Tx.warpgroup():
+                Tx.copy(Dreg_wg, tmem[:,no*8:no*8+8])
+            with Tx.thread():
+                Tx.cast(Dreg_16b[no*8:(no+1)*8], Dreg)
+
+        ld2mma.arrive(0, cta_id=0, pred=True)
+
+        # SMEM → GMEM (TMA store)
+        for no in Tx.unroll(MMA_N // EPI_N):
+            with Tx.thread():
+                Tx.copy(Dsmem[tid, :], Dreg_16b[...])
+                Tx.ptx.fence.proxy_async("shared::cta")
+            Tx.cuda.warpgroup_sync(10)
+            with Tx.thread(parent="warpgroup")[Tx.ptx.elect_sync()]:
+                Tx.copy_async(D[...], Dsmem, dispatch="tma")
+                Tx.ptx.cp_async.bulk.commit_group()
+                Tx.ptx.cp_async.bulk.wait_group(0)
+            Tx.cuda.warpgroup_sync(10)
+
+    while tile_scheduler.valid():
+        writeback()
+        tile_scheduler.next_tile()`;
+
+  renderAnnotatedCode(document.getElementById('col-tma-9'), tmaCode,
+    { 8: 'hl', 9: 'hl', 12: 'hl', 13: 'hl', 14: 'hl' });
+  renderAnnotatedCode(document.getElementById('col-mma-9'), mmaCode,
+    { 2: 'hl', 14: 'hl', 16: 'hl', 17: 'hl', 27: 'hl', 28: 'hl' });
+  renderAnnotatedCode(document.getElementById('col-wb-9'), wbCode);
+})();
+</script>
+</body>
+</html>

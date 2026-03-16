@@ -48,7 +48,7 @@
 </head>
 <body>
 
-<h1>Tensor Core</h1>
+<h1>tcgen05.mma</h1>
 
 <div class="controls">
   <div><span class="lbl">Transpose A</span>
@@ -66,15 +66,12 @@
 </div>
 <div class="controls">
   <div><span class="lbl">M (output rows)</span>
-    <div class="bg" id="nc">
-      <button class="btn on" data-v="16">16</button>
-      <button class="btn" data-v="32">32</button>
-      <button class="btn" data-v="64">64</button>
-      <button class="btn" data-v="128">128</button>
+    <div class="bg" id="mc">
+      <button class="btn on" data-v="128" disabled>128</button>
     </div>
   </div>
   <div><span class="lbl">N (output cols)</span>
-    <div class="bg" id="mc">
+    <div class="bg" id="nc">
       <button class="btn on" data-v="16">16</button>
       <button class="btn" data-v="32">32</button>
       <button class="btn" data-v="64">64</button>
@@ -93,22 +90,34 @@
 </div>
 
 <div class="main">
-  <div class="mat-box">
-    <h2 style="color:var(--color-group-0)" id="ah">A (128&times;128)</h2>
+  <div class="mat-box" style="border-color:#8b5cf6;">
+    <h2 style="color:#5b21b6" id="ah">A (SMEM)</h2>
     <div class="dims" id="ad"></div>
     <div class="grid" id="ga"></div>
   </div>
   <div class="op">&times;</div>
-  <div class="mat-box">
-    <h2 style="color:var(--color-group-1)" id="bh">B (128&times;128)</h2>
+  <div class="mat-box" style="border-color:#8b5cf6;">
+    <h2 style="color:#5b21b6" id="bh">B (SMEM)</h2>
     <div class="dims" id="bd"></div>
     <div class="grid" id="gb"></div>
   </div>
-  <div class="eq">&rarr;</div>
-  <div class="mat-box">
-    <h2 style="color:var(--color-group-4)">C</h2>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px; align-self:center; padding:0 4px;">
+    <div style="border:2.5px solid #059669; border-radius:8px; padding:6px 12px; text-align:center;">
+      <div style="font-size:11px; font-weight:700; color:#065f46;">Tensor Core</div>
+      <div style="font-size:8px; color:#059669; font-weight:600;">tcgen05.mma</div>
+    </div>
+    <div style="color:#059669; font-size:18px; font-weight:700; line-height:1;">&rarr;</div>
+  </div>
+  <div class="mat-box" style="border-color:#d97706;">
+    <h2 style="color:#92400e">C (TMEM)</h2>
     <div class="dims" id="cd"></div>
-    <div class="grid" id="gc"></div>
+    <div style="display:flex; align-items:flex-start; gap:4px;">
+      <div style="writing-mode:vertical-lr; transform:rotate(180deg); font-size:9px; font-weight:700; color:#d97706; display:flex; align-items:center; justify-content:center;">128 Lanes (M)</div>
+      <div>
+        <div class="grid" id="gc"></div>
+        <div style="text-align:center; font-size:9px; font-weight:700; color:#d97706; margin-top:2px;" id="col-label">Col (N) — allocated by <code style="font-size:8px; border:1px solid #d97706; border-radius:3px; padding:0 3px;">tmem.alloc</code></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -120,29 +129,42 @@
 <div class="formula-box" id="fbox"></div>
 <div class="info" id="inf"></div>
 
+<div style="max-width:1200px; margin:10px auto 0; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+  <div style="border:1px solid #8b5cf6; border-radius:8px; padding:8px 14px; font-family:'SF Mono','Fira Code',monospace; font-size:11px;">
+    <div style="font-weight:700; color:#5b21b6; margin-bottom:4px;">SMEM Descriptor (A, B)</div>
+    <div style="color:#475569;">smem_desc = <span style="color:#8b5cf6;">base_addr</span> | <span style="color:#8b5cf6;">leading_byte_offset</span> | <span style="color:#8b5cf6;">stride_byte_offset</span> | <span style="color:#8b5cf6;">start_addr_off</span></div>
+  </div>
+  <div style="border:1px solid #059669; border-radius:8px; padding:8px 14px; font-family:'SF Mono','Fira Code',monospace; font-size:11px;">
+    <div style="font-weight:700; color:#065f46; margin-bottom:4px;">tcgen05.mma PTX</div>
+    <div style="color:#475569;">tcgen05.mma.cta_group::1.kind::f16 <span style="color:#059669;">taddr</span>, <span style="color:#8b5cf6;">a_desc</span>, <span style="color:#8b5cf6;">b_desc</span>, <span style="color:#d97706;">idesc</span>, <span style="color:#059669;">enable</span>;</div>
+  </div>
+</div>
+
 <script>
-const BK = ['#5b9bd5','#ed9a3c','#d95555','#45b5a5','#5fb85f','#e0b828','#9d6eb5','#e87888'];
+// SMEM purple for A/B, TMEM amber for C (matching Blackwell arch slide)
+const BK = ['#8b5cf6','#8b5cf6','#d95555','#45b5a5','#d97706','#e0b828','#9d6eb5','#e87888'];
 const TOTAL = 128, BLOCK = 16;
 const BCOUNT = TOTAL / BLOCK; // 8x8 blocks
-const ST = { m: 16, n: 16, k: 0, rg: 0, cg: 0, tA: false, tB: false, playing: false, timer: null };
+// M = output rows, N = output cols. M fixed at 128 for tcgen05.
+const ST = { m: 128, n: 16, k: 0, rg: 0, cg: 0, tA: false, tB: false, playing: false, timer: null };
 
 function rebuildGroups() {
-  const nBlocks = ST.n / BLOCK;
-  const mBlocks = ST.m / BLOCK;
-  const nGroups = BCOUNT / nBlocks;
+  const mBlocks = ST.m / BLOCK; // row blocks
+  const nBlocks = ST.n / BLOCK; // col blocks
   const mGroups = BCOUNT / mBlocks;
+  const nGroups = BCOUNT / nBlocks;
   // Clamp
-  if (ST.rg >= nGroups) ST.rg = 0;
-  if (ST.cg >= mGroups) ST.cg = 0;
+  if (ST.rg >= mGroups) ST.rg = 0;
+  if (ST.cg >= nGroups) ST.cg = 0;
 
   const rg = document.getElementById('rg'); rg.innerHTML = '';
-  for (let i = 0; i < nGroups; i++) {
+  for (let i = 0; i < mGroups; i++) {
     const b = mk('button', 'btn' + (ST.rg === i ? ' on' : '')); b.textContent = i;
     b.onclick = (v => () => { ST.rg = v; rg.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
     rg.appendChild(b);
   }
   const cg = document.getElementById('cg'); cg.innerHTML = '';
-  for (let i = 0; i < mGroups; i++) {
+  for (let i = 0; i < nGroups; i++) {
     const b = mk('button', 'btn' + (ST.cg === i ? ' on' : '')); b.textContent = i;
     b.onclick = (v => () => { ST.cg = v; cg.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
     cg.appendChild(b);
@@ -150,44 +172,44 @@ function rebuildGroups() {
 }
 
 function draw() {
-  const nBlocks = ST.n / BLOCK;
-  const mBlocks = ST.m / BLOCK;
+  const mBlocks = ST.m / BLOCK; // row blocks
+  const nBlocks = ST.n / BLOCK; // col blocks
   const totalK = BCOUNT;
   const sz = Math.max(14, Math.min(28, 240 / BCOUNT));
   const tA = ST.tA, tB = ST.tB;
-  const rOff = ST.rg * nBlocks; // row offset in blocks
-  const cOff = ST.cg * mBlocks; // col offset in blocks
+  const rOff = ST.rg * mBlocks; // row offset in blocks
+  const cOff = ST.cg * nBlocks; // col offset in blocks
 
   // Headers
-  document.getElementById('ah').textContent = (tA ? 'A\u1d40' : 'A') + ' (128\u00d7128)';
-  document.getElementById('bh').textContent = (tB ? 'B\u1d40' : 'B') + ' (128\u00d7128)';
+  document.getElementById('ah').textContent = (tA ? 'A\u1d40' : 'A') + ' (SMEM)';
+  document.getElementById('bh').textContent = (tB ? 'B\u1d40' : 'B') + ' (SMEM)';
 
   // Dims
-  const nEnd = rOff + nBlocks - 1;
-  const mEnd = cOff + mBlocks - 1;
+  const mEnd = rOff + mBlocks - 1;
+  const nEnd = cOff + nBlocks - 1;
   if (tA) {
-    document.getElementById('ad').textContent = 'K\u00d7M: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', M-cols ' + rOff + '-' + nEnd;
+    document.getElementById('ad').textContent = 'K\u00d7M: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', M-cols ' + rOff + '-' + mEnd;
   } else {
-    document.getElementById('ad').textContent = 'M\u00d7K: M-rows ' + rOff + '-' + nEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
+    document.getElementById('ad').textContent = 'M\u00d7K: M-rows ' + rOff + '-' + mEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
   }
   if (tB) {
-    document.getElementById('bd').textContent = 'N\u00d7K: N-rows ' + cOff + '-' + mEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
+    document.getElementById('bd').textContent = 'N\u00d7K: N-rows ' + cOff + '-' + nEnd + ', K-col ' + (ST.k < 0 ? 'all' : ST.k);
   } else {
-    document.getElementById('bd').textContent = 'K\u00d7N: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', N-cols ' + cOff + '-' + mEnd;
+    document.getElementById('bd').textContent = 'K\u00d7N: K-row ' + (ST.k < 0 ? 'all' : ST.k) + ', N-cols ' + cOff + '-' + nEnd;
   }
-  document.getElementById('cd').textContent = 'M\u00d7N ' + ST.n + '\u00d7' + ST.m + ' accumulator';
+  document.getElementById('cd').textContent = ST.m + '\u00d7' + ST.n + ' accumulator';
 
-  // Matrix A: 8x8 grid of blocks
+  // Matrix A: 8x8 grid — highlight M-rows
   const ga = document.getElementById('ga'); ga.innerHTML = '';
   ga.style.gridTemplateColumns = 'repeat(' + BCOUNT + ',' + sz + 'px)';
   for (let r = 0; r < BCOUNT; r++) {
     for (let c = 0; c < BCOUNT; c++) {
       const d = mk('div', 'cell');
       d.style.width = sz + 'px'; d.style.height = sz + 'px';
-      const cellN = tA ? c : r;
+      const cellM = tA ? c : r;
       const cellK = tA ? r : c;
-      const inN = cellN >= rOff && cellN < rOff + nBlocks;
-      if (inN) {
+      const inM = cellM >= rOff && cellM < rOff + mBlocks;
+      if (inM) {
         if (cellK === ST.k) { d.style.background = BK[0]; d.classList.add('active'); }
         else if (cellK < ST.k) { d.style.background = BK[0]; d.style.opacity = '.4'; }
         else { d.classList.add('idle', 'dim'); }
@@ -198,7 +220,7 @@ function draw() {
     }
   }
 
-  // Matrix B: 8x8 grid of blocks
+  // Matrix B: 8x8 grid — highlight N-cols
   const gb = document.getElementById('gb'); gb.innerHTML = '';
   gb.style.gridTemplateColumns = 'repeat(' + BCOUNT + ',' + sz + 'px)';
   for (let r = 0; r < BCOUNT; r++) {
@@ -206,9 +228,9 @@ function draw() {
       const d = mk('div', 'cell');
       d.style.width = sz + 'px'; d.style.height = sz + 'px';
       const cellK = tB ? c : r;
-      const cellM = tB ? r : c;
-      const inM = cellM >= cOff && cellM < cOff + mBlocks;
-      if (inM) {
+      const cellN = tB ? r : c;
+      const inN = cellN >= cOff && cellN < cOff + nBlocks;
+      if (inN) {
         if (cellK === ST.k) { d.style.background = BK[1]; d.classList.add('active'); }
         else if (cellK < ST.k) { d.style.background = BK[1]; d.style.opacity = '.4'; }
         else { d.classList.add('idle', 'dim'); }
@@ -219,18 +241,21 @@ function draw() {
     }
   }
 
-  // C: small accumulator tile (nBlocks x mBlocks)
+  // C: always 8×8 (128×128 TMEM), allocated region green, rest grey
   const gc = document.getElementById('gc'); gc.innerHTML = '';
-  gc.style.gridTemplateColumns = 'repeat(' + mBlocks + ',' + sz + 'px)';
-  for (let r = 0; r < nBlocks; r++) {
-    for (let c = 0; c < mBlocks; c++) {
+  gc.style.gridTemplateColumns = 'repeat(' + BCOUNT + ',' + sz + 'px)';
+  for (let r = 0; r < BCOUNT; r++) {
+    for (let c = 0; c < BCOUNT; c++) {
       const d = mk('div', 'cell');
       d.style.width = sz + 'px'; d.style.height = sz + 'px';
-      d.style.background = BK[4]; d.classList.add('active');
+      if (r < mBlocks && c < nBlocks) {
+        d.style.background = BK[4]; d.classList.add('active');
+      } else {
+        d.classList.add('idle', 'dim');
+      }
       gc.appendChild(d);
     }
   }
-
   // K bar
   const kbar = document.getElementById('kbar'); kbar.innerHTML = '';
   const pb = mk('button', 'kb'); pb.style.width = '36px'; pb.style.fontSize = '16px';
@@ -260,11 +285,11 @@ function draw() {
   const bRef = tB ? 'B\u1d40[n, k]' : 'B[k, n]';
   const accum = ST.k === 0 ? 0 : 1;
   const assign = accum ? '+=' : '=';
-  fbox.textContent = 'MMA m' + ST.n + 'n' + ST.m + 'k16, accum=' + accum + '  |  C ' + assign + ' ' + aRef + ' \u00d7 ' + bRef;
+  fbox.textContent = 'MMA m' + ST.m + 'n' + ST.n + 'k16, accum=' + accum + '  |  C ' + assign + ' ' + aRef + ' \u00d7 ' + bRef;
 
   // Info
   const inf = document.getElementById('inf');
-  inf.textContent = 'K step ' + ST.k + ' of ' + totalK + '  |  A reads ' + nBlocks + ' block' + (nBlocks > 1 ? 's' : '') + ', B reads ' + mBlocks + ' block' + (mBlocks > 1 ? 's' : '');
+  inf.textContent = 'K step ' + ST.k + ' of ' + totalK + '  |  A reads ' + mBlocks + ' block' + (mBlocks > 1 ? 's' : '') + ', B reads ' + nBlocks + ' block' + (nBlocks > 1 ? 's' : '');
 }
 
 function mk(t, c) { const d = document.createElement(t); if (c) d.className = c; return d; }
@@ -282,6 +307,10 @@ function mk(t, c) { const d = document.createElement(t); if (c) d.className = c;
     document.querySelectorAll('#nc .btn').forEach(x => x.classList.remove('on')); b.classList.add('on');
     rebuildGroups(); draw();
   };
+  // Default M=128 selected
+  ST.m = 128;
+  document.querySelectorAll('#mc .btn').forEach(x => x.classList.remove('on'));
+  document.querySelector('#mc .btn[data-v="128"]').classList.add('on');
   document.getElementById('ta').onclick = e => {
     const b = e.target.closest('.btn'); if (!b) return;
     ST.tA = b.dataset.v === '1';

@@ -64,13 +64,13 @@
     </div>
   </div>
 </div>
-<div class="sub" id="subtitle">C(N&times;M) += A(N&times;K) &times; B(K&times;M) &nbsp;|&nbsp; Each cell = 16&times;16 fp16 block</div>
+<div class="sub" id="subtitle">C(M&times;N) += A(M&times;K) &times; B(K&times;N) &nbsp;|&nbsp; Each cell = 16&times;16 fp16 block</div>
 <div class="controls">
-  <div><span class="lbl">N-slice (row of C)</span>
-    <div class="bg" id="ns"></div>
-  </div>
-  <div><span class="lbl">M-slice (col of C)</span>
+  <div><span class="lbl">M-slice (row of C)</span>
     <div class="bg" id="ms"></div>
+  </div>
+  <div><span class="lbl">N-slice (col of C)</span>
+    <div class="bg" id="ns"></div>
   </div>
 </div>
 
@@ -105,7 +105,7 @@
 <script>
 const BK = ['#5b9bd5','#ed9a3c','#d95555','#45b5a5','#5fb85f','#e0b828','#9d6eb5','#e87888'];
 const GRID = 4; // 4x4 blocks = 64x64
-const ST = { n: 0, m: 0, k: -1, tA: false, tB: false, playing: false, timer: null };
+const ST = { m: 0, n: 0, k: -1, tA: false, tB: false, playing: false, timer: null };
 
 function draw() {
   const K = GRID;
@@ -113,40 +113,39 @@ function draw() {
 
   // Subtitle
   const sub = document.getElementById('subtitle');
-  const aShape = tA ? 'A\u1d40(K\u00d7N)' : 'A(N\u00d7K)';
-  const bShape = tB ? 'B\u1d40(M\u00d7K)' : 'B(K\u00d7M)';
-  sub.innerHTML = 'C(N\u00d7M) += ' + aShape + ' \u00d7 ' + bShape + ' &nbsp;|&nbsp; Each cell = 16\u00d716 fp16 block';
+  const aShape = tA ? 'A\u1d40(K\u00d7M)' : 'A(M\u00d7K)';
+  const bShape = tB ? 'B\u1d40(N\u00d7K)' : 'B(K\u00d7N)';
+  sub.innerHTML = 'C(M\u00d7N) += ' + aShape + ' \u00d7 ' + bShape + ' &nbsp;|&nbsp; Each cell = 16\u00d716 fp16 block';
 
   // Headers
   document.getElementById('ah').textContent = tA ? 'A\u1d40' : 'A';
   document.getElementById('bh').textContent = tB ? 'B\u1d40' : 'B';
 
-  // A dimensions: normal = N×K, transposed = K×N
+  // A dimensions: normal = M×K, transposed = K×M
   const aRows = tA ? GRID : GRID;
   const aCols = tA ? GRID : GRID;
-  const aRLabel = tA ? 'K' : 'N';
-  const aCLabel = tA ? 'N' : 'K';
+  const aRLabel = tA ? 'K' : 'M';
+  const aCLabel = tA ? 'M' : 'K';
   document.getElementById('ad').textContent = (aRows * 16) + '\u00d7' + (aCols * 16) + ' (rows=' + aRLabel + ', cols=' + aCLabel + ')';
 
-  // B dimensions: normal = K×M, transposed = M×K
+  // B dimensions: normal = K×N, transposed = N×K
   const bRows = tB ? GRID : GRID;
   const bCols = tB ? GRID : GRID;
-  const bRLabel = tB ? 'M' : 'K';
-  const bCLabel = tB ? 'K' : 'M';
+  const bRLabel = tB ? 'N' : 'K';
+  const bCLabel = tB ? 'K' : 'N';
   document.getElementById('bd').textContent = (bRows * 16) + '\u00d7' + (bCols * 16) + ' (rows=' + bRLabel + ', cols=' + bCLabel + ')';
 
-  document.getElementById('cd').textContent = (GRID * 16) + '\u00d7' + (GRID * 16) + ' (rows=N, cols=M)';
+  document.getElementById('cd').textContent = (GRID * 16) + '\u00d7' + (GRID * 16) + ' (rows=M, cols=N)';
 
-  // Matrix A
+  // Matrix A: highlight row matching ST.m
   const ga = document.getElementById('ga'); ga.innerHTML = '';
   ga.style.gridTemplateColumns = 'repeat(' + aCols + ', 40px)';
   for (let r = 0; r < aRows; r++) {
     for (let c = 0; c < aCols; c++) {
       const d = mk('div', 'cell');
-      // Logical indices: which N and K does this cell represent?
-      const cellN = tA ? c : r;
+      const cellM = tA ? c : r;
       const cellK = tA ? r : c;
-      if (cellN === ST.n) {
+      if (cellM === ST.m) {
         if (ST.k >= 0 && cellK === ST.k) { d.style.background = BK[0]; d.classList.add('active'); }
         else if (ST.k >= 0 && cellK < ST.k) { d.style.background = BK[0]; d.style.opacity = '.4'; }
         else if (ST.k < 0) { d.style.background = BK[0]; d.classList.add('active'); }
@@ -158,15 +157,15 @@ function draw() {
     }
   }
 
-  // Matrix B
+  // Matrix B: highlight col matching ST.n
   const gb = document.getElementById('gb'); gb.innerHTML = '';
   gb.style.gridTemplateColumns = 'repeat(' + bCols + ', 40px)';
   for (let r = 0; r < bRows; r++) {
     for (let c = 0; c < bCols; c++) {
       const d = mk('div', 'cell');
       const cellK = tB ? c : r;
-      const cellM = tB ? r : c;
-      if (cellM === ST.m) {
+      const cellN = tB ? r : c;
+      if (cellN === ST.n) {
         if (ST.k >= 0 && cellK === ST.k) { d.style.background = BK[1]; d.classList.add('active'); }
         else if (ST.k >= 0 && cellK < ST.k) { d.style.background = BK[1]; d.style.opacity = '.4'; }
         else if (ST.k < 0) { d.style.background = BK[1]; d.classList.add('active'); }
@@ -178,13 +177,13 @@ function draw() {
     }
   }
 
-  // Matrix C: N rows, M cols (always)
+  // Matrix C: M rows, N cols
   const gc = document.getElementById('gc'); gc.innerHTML = '';
   gc.style.gridTemplateColumns = 'repeat(' + GRID + ', 40px)';
   for (let r = 0; r < GRID; r++) {
     for (let c = 0; c < GRID; c++) {
       const d = mk('div', 'cell');
-      if (r === ST.n && c === ST.m) {
+      if (r === ST.m && c === ST.n) {
         d.style.background = BK[4]; d.classList.add('active');
       } else {
         d.classList.add('idle', 'dim');
@@ -195,7 +194,6 @@ function draw() {
 
   // K bar
   const kbar = document.getElementById('kbar'); kbar.innerHTML = '';
-  // Play button first
   const pb = mk('button', 'kb'); pb.style.width = '36px'; pb.style.fontSize = '16px';
   pb.innerHTML = '&#x25b7;';
   pb.onclick = () => {
@@ -222,39 +220,39 @@ function draw() {
 
   // Formula
   const fbox = document.getElementById('fbox');
-  const aRef = tA ? 'A\u1d40[k, n]' : 'A[n, k]';
-  const bRef = tB ? 'B\u1d40[m, k]' : 'B[k, m]';
-  fbox.textContent = 'C[n, m] += ' + aRef + ' \u00d7 ' + bRef + ', for k = 0 .. K-1';
+  const aRef = tA ? 'A\u1d40[k, m]' : 'A[m, k]';
+  const bRef = tB ? 'B\u1d40[n, k]' : 'B[k, n]';
+  fbox.textContent = 'C[m, n] += ' + aRef + ' \u00d7 ' + bRef + ', for k = 0 .. K-1';
 
   // Info
   const inf = document.getElementById('inf');
-  const aIdx = tA ? '[' + ST.k + ',' + ST.n + ']' : '[' + ST.n + ',' + ST.k + ']';
-  const bIdx = tB ? '[' + ST.m + ',' + ST.k + ']' : '[' + ST.k + ',' + ST.m + ']';
+  const aIdx = tA ? '[' + ST.k + ',' + ST.m + ']' : '[' + ST.m + ',' + ST.k + ']';
+  const bIdx = tB ? '[' + ST.n + ',' + ST.k + ']' : '[' + ST.k + ',' + ST.n + ']';
   const aName = tA ? 'A\u1d40' : 'A';
   const bName = tB ? 'B\u1d40' : 'B';
   if (ST.k < 0) {
-    inf.textContent = 'C[' + ST.n + ',' + ST.m + '] = sum over k of ' + aName + '[' + ST.n + ',k] \u00d7 ' + bName + '[k,' + ST.m + ']';
+    inf.textContent = 'C[' + ST.m + ',' + ST.n + '] = sum over k of ' + aName + '[' + ST.m + ',k] \u00d7 ' + bName + '[k,' + ST.n + ']';
   } else {
-    inf.textContent = 'K step ' + ST.k + ': C[' + ST.n + ',' + ST.m + '] += ' + aName + aIdx + ' \u00d7 ' + bName + bIdx;
+    inf.textContent = 'K step ' + ST.k + ': C[' + ST.m + ',' + ST.n + '] += ' + aName + aIdx + ' \u00d7 ' + bName + bIdx;
   }
 }
 
 function mk(t, c) { const d = document.createElement(t); if (c) d.className = c; return d; }
 
 (function init() {
-  // N-slice buttons
-  const ns = document.getElementById('ns');
-  for (let i = 0; i < GRID; i++) {
-    const b = mk('button', 'btn' + (i === 0 ? ' on' : '')); b.textContent = i;
-    b.onclick = (v => () => { ST.n = v; ns.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
-    ns.appendChild(b);
-  }
-  // M-slice buttons
+  // M-slice buttons (row of C)
   const ms = document.getElementById('ms');
   for (let i = 0; i < GRID; i++) {
     const b = mk('button', 'btn' + (i === 0 ? ' on' : '')); b.textContent = i;
     b.onclick = (v => () => { ST.m = v; ms.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
     ms.appendChild(b);
+  }
+  // N-slice buttons (col of C)
+  const ns = document.getElementById('ns');
+  for (let i = 0; i < GRID; i++) {
+    const b = mk('button', 'btn' + (i === 0 ? ' on' : '')); b.textContent = i;
+    b.onclick = (v => () => { ST.n = v; ns.querySelectorAll('.btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); })(i);
+    ns.appendChild(b);
   }
   // Transpose A
   document.getElementById('ta').onclick = e => {

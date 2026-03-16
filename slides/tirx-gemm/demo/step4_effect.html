@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why 116× Faster?</title>
+<link rel="stylesheet" href="../viz-base.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 1.5rem 2.5rem 1.2rem; max-width: 1200px; margin: 0 auto; }
+  header { margin-bottom: 1.2rem; }
+
+  /* ── Section 1: Factor Cards ── */
+  .factor-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+  .factor-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.2rem 1rem;
+    border-top: 3.5px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .factor-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .factor-card:nth-child(1) { border-top-color: #3b82f6; }
+  .factor-card:nth-child(2) { border-top-color: #059669; }
+  .factor-card:nth-child(3) { border-top-color: #d97706; }
+  .factor-icon { font-size: 1.6rem; margin-bottom: 0.3rem; }
+  .factor-number {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 0.15rem;
+    line-height: 1.2;
+  }
+  .factor-card:nth-child(1) .factor-number { color: #3b82f6; }
+  .factor-card:nth-child(2) .factor-number { color: #059669; }
+  .factor-card:nth-child(3) .factor-number { color: #d97706; }
+  .factor-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .factor-detail {
+    font-size: 0.74rem;
+    color: var(--dim);
+    line-height: 1.55;
+  }
+
+  /* ── Section 2: Waterfall Chart ── */
+  .waterfall-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem 1.1rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .waterfall-section h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--dim);
+    margin-bottom: 1rem;
+  }
+
+  .wf-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    gap: 0;
+  }
+  .wf-label {
+    width: 65px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: right;
+    padding-right: 10px;
+    flex-shrink: 0;
+    color: var(--text);
+  }
+  .wf-bar-area {
+    flex: 1;
+    position: relative;
+  }
+  .wf-stacked {
+    display: flex;
+    height: 32px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .wf-seg {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: width 0.8s ease;
+  }
+  .wf-seg span { padding: 0 4px; }
+  .wf-time {
+    width: 60px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: right;
+    padding-left: 8px;
+    flex-shrink: 0;
+    font-family: 'SF Mono','Fira Code',monospace;
+    color: var(--text);
+  }
+  .wf-note {
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 2px;
+    padding-left: 75px;
+  }
+  .wf-note-red { color: #dc2626; }
+  .wf-note-blue { color: #2563eb; }
+
+  .seg-copy    { background: #ef4444; }
+  .seg-compute { background: #059669; }
+  .seg-wb      { background: #d97706; }
+  .seg-tma-issue   { background: #3b82f6; }
+  .seg-tma-xfer    { background: #60a5fa; }
+
+  /* Speedup connector */
+  .speedup-row {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0 0.3rem;
+    padding-left: 65px;
+  }
+  .speedup-bracket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+  }
+  .speedup-line {
+    width: 2px;
+    height: 8px;
+    background: var(--accent);
+  }
+  .speedup-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    background: rgba(59,130,246,0.12);
+    color: #2563eb;
+    border: 1.5px solid rgba(59,130,246,0.3);
+  }
+  .speedup-badge .arrow { font-size: 1rem; }
+
+  /* Legend */
+  .wf-legend {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .wf-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: var(--dim);
+  }
+  .wf-legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── Section 3: Takeaway ── */
+  .takeaway {
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: 10px;
+    padding: 1rem 1.4rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #92400e;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+  .takeaway-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+  .takeaway strong { color: #78350f; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Why 116× Faster?</h1>
+    <p class="sub">Breaking down the performance gap at 2048³: 6.0ms → 0.052ms</p>
+  </header>
+
+  <!-- Section 1: Three Factor Cards -->
+  <div class="factor-cards">
+    <div class="factor-card">
+      <div class="factor-icon">🧵</div>
+      <div class="factor-number">128× → 1×</div>
+      <div class="factor-title">Thread Efficiency</div>
+      <div class="factor-detail">Sync copy: all 128 threads stalled on memory. TMA: 1 thread issues, 127 free. Instruction-level parallelism reclaimed.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-icon">⚡</div>
+      <div class="factor-number">HW Bandwidth</div>
+      <div class="factor-title">Saturate Memory Bus</div>
+      <div class="factor-detail">TMA engine is a dedicated DMA unit — it fills the memory pipeline optimally. Software copies leave gaps between loads.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-icon">🔄</div>
+      <div class="factor-number">Zero Bank Conflict</div>
+      <div class="factor-title">Swizzle Layout</div>
+      <div class="factor-detail">tma_shared_layout() auto-applies 128B swizzle. TMA writes conflict-free patterns. No manual bank-conflict avoidance.</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Waterfall Chart -->
+  <div class="waterfall-section">
+    <h2>Performance Waterfall</h2>
+
+    <!-- Step 1 bar -->
+    <div class="wf-row">
+      <div class="wf-label">Step 3</div>
+      <div class="wf-bar-area">
+        <div class="wf-stacked" id="bar-step1">
+          <div class="wf-seg seg-copy" style="width:0%" data-target="99.4"><span>Thread copy — 6.0ms</span></div>
+          <div class="wf-seg seg-compute" style="width:0%" data-target="0.42"><span></span></div>
+          <div class="wf-seg seg-wb" style="width:0%" data-target="0.14"><span></span></div>
+        </div>
+      </div>
+      <div class="wf-time">6.0ms</div>
+    </div>
+    <div class="wf-note wf-note-red">⚠ 2.9 TFLOP/s — thread copies dominate (M=N=K=2048)</div>
+
+    <!-- Speedup connector -->
+    <div class="speedup-row">
+      <div class="speedup-bracket">
+        <div class="speedup-line"></div>
+        <div class="speedup-badge"><span class="arrow">↓</span> 116× faster</div>
+        <div class="speedup-line"></div>
+      </div>
+    </div>
+
+    <!-- Step 4 bar -->
+    <div class="wf-row">
+      <div class="wf-label">Step 4</div>
+      <div class="wf-bar-area">
+        <div class="wf-stacked" id="bar-step4" style="width: 15%">
+          <div class="wf-seg seg-tma-issue" style="width:0%" data-target="1.7"></div>
+          <div class="wf-seg seg-tma-xfer" style="width:0%" data-target="43.1"><span></span></div>
+          <div class="wf-seg seg-compute" style="width:0%" data-target="51.7"><span></span></div>
+          <div class="wf-seg seg-wb" style="width:0%" data-target="3.4"><span></span></div>
+        </div>
+      </div>
+      <div class="wf-time">0.052ms</div>
+    </div>
+    <div class="wf-note wf-note-blue">✓ 330 TFLOP/s — TMA saturates memory bus (M=N=K=2048)</div>
+
+    <!-- Legend -->
+    <div class="wf-legend">
+      <div class="wf-legend-item"><div class="wf-legend-swatch" style="background:#ef4444"></div>Thread copy</div>
+      <div class="wf-legend-item"><div class="wf-legend-swatch" style="background:#3b82f6"></div>TMA issue</div>
+      <div class="wf-legend-item"><div class="wf-legend-swatch" style="background:#60a5fa"></div>TMA transfer</div>
+      <div class="wf-legend-item"><div class="wf-legend-swatch" style="background:#059669"></div>MMA compute</div>
+      <div class="wf-legend-item"><div class="wf-legend-swatch" style="background:#d97706"></div>Writeback</div>
+    </div>
+  </div>
+
+  <!-- Section 3: Key Takeaway -->
+  <div class="takeaway">
+    <div class="takeaway-icon">💡</div>
+    <div>
+      <strong>The #1 optimization in GPU programming:</strong> replace synchronous data movement with hardware-driven async transfers.
+      This single change accounts for 99% of the speedup from Step 1 to Step 4.
+    </div>
+  </div>
+
+<script>
+(function () {
+  requestAnimationFrame(function () {
+    setTimeout(function () {
+      var bars = document.querySelectorAll('.wf-seg');
+      bars.forEach(function (seg) {
+        var target = seg.getAttribute('data-target');
+        if (target) seg.style.width = target + '%';
+      });
+    }, 120);
+  });
+})();
+</script>
+</body>
+</html>

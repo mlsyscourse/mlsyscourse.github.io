@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axe Layout in Practice</title>
+<link rel="stylesheet" href="../viz-base.css">
+<link rel="stylesheet" href="../code-highlight.css">
+<script src="../viz-base.js"></script>
+<style>
+  body { padding: 18px 28px; max-width: 1300px; margin: 0 auto; }
+
+  .compare {
+    display: grid; grid-template-columns: 1fr 40px 1fr;
+    gap: 0; margin-bottom: 16px; align-items: stretch;
+  }
+  .cmp-panel {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .cmp-header {
+    padding: 8px 14px; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em; color: #fff;
+  }
+  .cmp-header.green { background: #059669; }
+  .cmp-header.slate { background: #0f172a; }
+  .cmp-body {
+    padding: 12px 14px;
+    font-family: 'SF Mono','Fira Code',monospace;
+    font-size: 12px; line-height: 1.75;
+  }
+  .cmp-body.tirx-bg { background: #f0fdf4; color: #1e293b; }
+  .cmp-body.ptx-bg  { background: #0f172a; color: #e2e8f0; }
+
+  .hl { background: rgba(59,130,246,.12); display: inline; padding: 1px 3px; border-radius: 3px; }
+  .ptx-bg .hl { background: rgba(125,211,252,.12); }
+
+  .arrow-col {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .arrow-col svg { width: 28px; height: 40px; }
+
+  .layout-section {
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface); padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .layout-title {
+    font-size: 13px; font-weight: 700; margin-bottom: 10px;
+    text-align: center;
+  }
+  .layout-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+  }
+  .layout-card {
+    border: 2px solid; border-radius: 8px; padding: 10px 12px;
+  }
+  .layout-card.lc-smem { border-color: #8b5cf6; background: #faf5ff; }
+  .layout-card.lc-tmem { border-color: #d97706; background: #fffbeb; }
+  .layout-card.lc-reg  { border-color: #dc2626; background: #fef2f2; }
+
+  .lc-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 4px;
+  }
+  .lc-smem .lc-label { color: #5b21b6; }
+  .lc-tmem .lc-label { color: #92400e; }
+  .lc-reg  .lc-label { color: #991b1b; }
+
+  .lc-code {
+    font-family: 'SF Mono','Fira Code',monospace;
+    font-size: 10.5px; line-height: 1.5; color: #334155;
+    word-break: break-all;
+  }
+  .lc-desc {
+    font-size: 10.5px; color: #64748b; margin-top: 4px; line-height: 1.4;
+  }
+
+  .callout {
+    margin-top: 14px; padding: 10px 14px;
+    background: #ecfdf5; border-left: 4px solid #059669;
+    border-radius: 0 8px 8px 0;
+    font-size: 12px; line-height: 1.6; color: #065f46;
+  }
+  .callout strong { color: #047857; }
+
+  @media(max-width:900px) {
+    .compare { grid-template-columns: 1fr; }
+    .arrow-col { display: none; }
+    .layout-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <h1>Axe Layout in Practice</h1>
+  <p class="sub">You write TIRx (left) → compiler deduces PTX (right)</p>
+
+  <div class="compare">
+    <div class="cmp-panel">
+      <div class="cmp-header green">You write: TIRx (~8 lines)</div>
+      <div class="cmp-body tirx-bg code-light">
+<span class="cmt"># 1. Declare buffers with layout</span>
+<span class="kw">pool</span> = Tx.<span class="fn">PoolAllocator</span>(buf.data)
+<span class="hl"><span class="kw">Asmem</span> = pool.<span class="fn">alloc</span>((<span class="num">128</span>,<span class="num">64</span>), <span class="str">"fp16"</span>, layout=<span class="fn">tma_shared_layout</span>(...))</span>
+<span class="hl"><span class="kw">Bsmem</span> = pool.<span class="fn">alloc</span>((<span class="num">128</span>,<span class="num">64</span>), <span class="str">"fp16"</span>, layout=<span class="fn">tma_shared_layout</span>(...))</span>
+T.ptx.tcgen05.<span class="fn">alloc</span>(tmem_addr, n_cols=<span class="num">512</span>)
+
+<span class="cmt"># 2. Operate on tiles</span>
+<span class="hl">Tx.<span class="fn">copy_async</span>(Asmem, A[m:m+<span class="num">128</span>, k:k+<span class="num">64</span>], dispatch=<span class="str">"tma"</span>)</span>
+<span class="hl">Tx.<span class="fn">gemm_async</span>(tmem[:,:BLK_N], Asmem, Bsmem, dispatch=<span class="str">"tcgen05"</span>)</span>
+      </div>
+    </div>
+
+    <div class="arrow-col">
+      <svg viewBox="0 0 28 40">
+        <path d="M4 20 H20" stroke="#059669" stroke-width="2.5" fill="none"/>
+        <polygon points="18,14 28,20 18,26" fill="#059669"/>
+      </svg>
+    </div>
+
+    <div class="cmp-panel">
+      <div class="cmp-header slate">Compiler generates: PTX</div>
+      <div class="cmp-body ptx-bg code-dark">
+<span class="cmt">// From layout → SmemDescriptor</span>
+<span class="hl"><span class="kw">desc</span> <span class="op">=</span> base_addr <span class="op">|</span> (swizzle_mode <span class="op">&lt;&lt;</span> <span class="num">62</span>)
+       <span class="op">|</span> (ldo <span class="op">&gt;&gt;</span> <span class="num">4</span>) <span class="op">&lt;&lt;</span> <span class="num">16</span> <span class="op">|</span> ...</span>
+
+<span class="cmt">// From layout → correct TMA instruction</span>
+<span class="hl"><span class="kw">cp.async.bulk.tensor</span>.2d
+    .shared::cluster.global [smem], [tmap], {x,y}</span>
+
+<span class="cmt">// From layout → correct MMA with descriptors</span>
+<span class="hl"><span class="kw">tcgen05.mma</span>.cta_group::1.kind::f16
+    [tmem], a_desc, b_desc, idesc, <span class="num">1</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout-section">
+    <div class="layout-title">Three Memory Spaces, Three Layouts</div>
+    <div class="layout-grid">
+      <div class="layout-card lc-smem">
+        <div class="lc-label">SMEM</div>
+        <div class="lc-code">tma_shared_layout("fp16", SWIZZLE_128B, (128, 64))</div>
+        <div class="lc-desc">K-major with 128B swizzle. TMA-compatible, bank-conflict-free.</div>
+      </div>
+      <div class="layout-card lc-tmem">
+        <div class="lc-label">TMEM</div>
+        <div class="lc-code">TileLayout(([128, 512], [1@TLane, 1@TCol]))</div>
+        <div class="lc-desc">128 lanes × N cols. Hardware-managed, not directly addressable.</div>
+      </div>
+      <div class="layout-card lc-reg">
+        <div class="lc-label">Register</div>
+        <div class="lc-code">TileLayout(([128, BLK_N], [1@tid_in_wg, 1]))</div>
+        <div class="lc-desc">Per-thread view via warpgroup tid. Used for TMEM→Reg readout.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Layout drives code generation:</strong> When you call <code>Tx.copy_async(Asmem, A[...])</code>, the compiler checks Asmem's layout to choose between TMA vs thread-copy, compute the tensormap fields, and select the right swizzle mode — all from the layout declaration.
+  </div>
+</body>
+</html>

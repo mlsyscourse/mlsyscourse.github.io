@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blackwell GPU and TIRx</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<link rel="stylesheet" href="mlsyscourse.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title -->
+<section class="title-slide">
+  <p class="main-title">15-442/15-642: Machine Learning Systems</p>
+  <p class="lecture-title">Blackwell GPU and TIRx</p>
+  <div class="info">
+    Spring 2026<br>
+    Tianqi Chen and Zhihao Jia<br>
+    Carnegie Mellon University
+  </div>
+</section>
+
+<!-- Outline -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li>Blackwell Programming Model</li>
+    <li>TIRx Programming Model</li>
+    <li>Step 1 — Sync GEMM</li>
+    <li>Step 4 — TMA Async</li>
+    <li>Step 7 — Warp Specialization</li>
+    <li>Step 9 — 2-CTA Cluster</li>
+    <li>Summary</li>
+  </ul>
+</section>
+
+<!-- Outline: Blackwell Programming Model -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li>Blackwell Programming Model</li>
+    <li class="dim">TIRx Programming Model</li>
+    <li class="dim">Step 1 — Sync GEMM</li>
+    <li class="dim">Step 4 — TMA Async</li>
+    <li class="dim">Step 7 — Warp Specialization</li>
+    <li class="dim">Step 9 — 2-CTA Cluster</li>
+    <li class="dim">Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: Blackwell SM Architecture -->
+<section class="demo-slide">
+  <h2>Blackwell SM Architecture</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/sm_architecture.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Example GEMM Data Pipeline on Blackwell -->
+<section class="demo-slide">
+  <h2>Example GEMM Data Pipeline on Blackwell</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/pipeline_arch.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: tcgen05 & Tensor Memory -->
+<section class="demo-slide">
+  <h2>tcgen05 & Tensor Memory</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/tcgen05_intro.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: TMA: Tensor Memory Accelerator -->
+<section class="demo-slide">
+  <h2>TMA: Tensor Memory Accelerator</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/tma_intro.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Async Coordination: Barriers -->
+<section class="demo-slide">
+  <h2>Async Coordination: Barriers</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/barrier_intro.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: MBarrier: Data Structure & APIs -->
+<section class="demo-slide">
+  <h2>MBarrier: Data Structure & APIs</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/mbarrier_mechanism.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: MBarrier for Cross-Thread Synchronization -->
+<section class="demo-slide">
+  <h2>MBarrier for Cross-Thread Synchronization</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/mbarrier_arrive_timeline.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: MBarrier to Signal TMA Completion -->
+<section class="demo-slide">
+  <h2>MBarrier to Signal TMA Completion</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/mbarrier_tma_timeline.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: MBarrier to Signal tcgen05 Completion -->
+<section class="demo-slide">
+  <h2>MBarrier to Signal tcgen05 Completion</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/mbarrier_tcgen05_timeline.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Phase Tracking -->
+<section class="demo-slide">
+  <h2>Phase Tracking</h2>
+  <div class="iframe-wrap" style="height:1100px">
+    <iframe src="demo/phase_tracking.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(1.0);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: TIRx Programming Model -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Blackwell Programming Model</li>
+    <li>TIRx Programming Model</li>
+    <li class="dim">Step 1 — Sync GEMM</li>
+    <li class="dim">Step 4 — TMA Async</li>
+    <li class="dim">Step 7 — Warp Specialization</li>
+    <li class="dim">Step 9 — 2-CTA Cluster</li>
+    <li class="dim">Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: What is TIRx: Native Level Access -->
+<section class="demo-slide">
+  <h2>What is TIRx: Native Level Access</h2>
+  <div class="iframe-wrap" style="height:770px">
+    <iframe src="demo/tirx_raw_cuda_ptx_tcgen05.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.7);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Native Level Access -->
+<section class="demo-slide">
+  <h2>Native Level Access</h2>
+  <div class="iframe-wrap" style="height:990px">
+    <iframe src="demo/why_cuda_ptx_native.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.9);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Minimal Tile level Access -->
+<section class="demo-slide">
+  <h2>Minimal Tile level Access</h2>
+  <div class="iframe-wrap" style="height:990px">
+    <iframe src="demo/however_cuda_cpp_painful.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.9);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: TIRx: Determinstic Op Dispatch -->
+<section class="demo-slide">
+  <h2>TIRx: Determinstic Op Dispatch</h2>
+  <div class="iframe-wrap" style="height:770px">
+    <iframe src="demo/tirx_operator_dispatch.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.7);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Step 1 — Sync GEMM -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Blackwell Programming Model</li>
+    <li class="dim">TIRx Programming Model</li>
+    <li>Step 1 — Sync GEMM</li>
+    <li class="dim">Step 4 — TMA Async</li>
+    <li class="dim">Step 7 — Warp Specialization</li>
+    <li class="dim">Step 9 — 2-CTA Cluster</li>
+    <li class="dim">Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: Step 1: Sync Load + MMA + Sync Store -->
+<section class="demo-slide">
+  <h2>Step 1: Sync Load + MMA + Sync Store</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step1_annotated.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Step 1: Full Code -->
+<section class="demo-slide">
+  <h2>Step 1: Full Code</h2>
+  <div class="iframe-wrap" style="height:825px">
+    <iframe src="demo/step1_fullcode.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.75);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Step 4 — TMA Async -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Blackwell Programming Model</li>
+    <li class="dim">TIRx Programming Model</li>
+    <li class="dim">Step 1 — Sync GEMM</li>
+    <li>Step 4 — TMA Async</li>
+    <li class="dim">Step 7 — Warp Specialization</li>
+    <li class="dim">Step 9 — 2-CTA Cluster</li>
+    <li class="dim">Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: Step 4: TMA Async Load -->
+<section class="demo-slide">
+  <h2>Step 4: TMA Async Load</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step4_load.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Step 4: TMA Async Store (Writeback) -->
+<section class="demo-slide">
+  <h2>Step 4: TMA Async Store (Writeback)</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step4_store.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Step 4: Full Code -->
+<section class="demo-slide">
+  <h2>Step 4: Full Code</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step4_fullcode.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Step 7 — Warp Specialization -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Blackwell Programming Model</li>
+    <li class="dim">TIRx Programming Model</li>
+    <li class="dim">Step 1 — Sync GEMM</li>
+    <li class="dim">Step 4 — TMA Async</li>
+    <li>Step 7 — Warp Specialization</li>
+    <li class="dim">Step 9 — 2-CTA Cluster</li>
+    <li class="dim">Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: Pipeline: Overlap Load, Compute, Writeback -->
+<section class="demo-slide">
+  <h2>Pipeline: Overlap Load, Compute, Writeback</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/pipeline_dynamic.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Warp Specialization: Overlap Everything -->
+<section class="demo-slide">
+  <h2>Warp Specialization: Overlap Everything</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step7_principle.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Step 7: Warp Specialization — Code -->
+<section class="demo-slide">
+  <h2>Step 7: Warp Specialization &mdash; Code</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step7_annotated.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Step 9 — 2-CTA Cluster -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Blackwell Programming Model</li>
+    <li class="dim">TIRx Programming Model</li>
+    <li class="dim">Step 1 — Sync GEMM</li>
+    <li class="dim">Step 4 — TMA Async</li>
+    <li class="dim">Step 7 — Warp Specialization</li>
+    <li>Step 9 — 2-CTA Cluster</li>
+    <li class="dim">Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: Why Cluster? -->
+<section class="demo-slide">
+  <h2>Why Cluster?</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step9_motivation.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Distributed Shared Memory -->
+<section class="demo-slide">
+  <h2>Distributed Shared Memory</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step9_principle.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Asymmetric Roles: CTA-0 vs CTA-1 -->
+<section class="demo-slide">
+  <h2>Asymmetric Roles: CTA-0 vs CTA-1</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step9_roles.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Demo: Step 9: 2-CTA Cluster — Code -->
+<section class="demo-slide">
+  <h2>Step 9: 2-CTA Cluster &mdash; Code</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/step9_annotated.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+<!-- Outline: Summary -->
+<section class="outline-slide">
+  <h2>Outline</h2>
+  <ul class="outline-items">
+    <li class="dim">Blackwell Programming Model</li>
+    <li class="dim">TIRx Programming Model</li>
+    <li class="dim">Step 1 — Sync GEMM</li>
+    <li class="dim">Step 4 — TMA Async</li>
+    <li class="dim">Step 7 — Warp Specialization</li>
+    <li class="dim">Step 9 — 2-CTA Cluster</li>
+    <li>Summary</li>
+  </ul>
+</section>
+
+<!-- Demo: The Optimization Journey -->
+<section class="demo-slide">
+  <h2>The Optimization Journey</h2>
+  <div class="iframe-wrap" style="height:880px">
+    <iframe src="demo/summary_journey.html?embed" width="1600" height="1100" style="transform:translateX(-50%) scale(0.8);transform-origin:top center"></iframe>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    width: 1200,
+    height: 700,
+    margin: 0,
+    center: false,
+    transition: 'slide',
+  });
+  // Forward arrow keys from embedded iframes to Reveal
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'revealKey') {
+      var ev = new KeyboardEvent('keydown', { keyCode: e.data.keyCode, bubbles: true });
+      document.dispatchEvent(ev);
+    }
+  });
+</script>
+</body>
+</html>

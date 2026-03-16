@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TIRx: Operator Dispatch</title>
+<link rel="stylesheet" href="../viz-base.css">
+<link rel="stylesheet" href="../code-highlight.css">
+<script src="../code-highlight.js"></script>
+<style>
+  .panels { grid-template-columns:1.3fr 1fr; max-width:1200px; }
+
+  .panel h2 {
+    font-size:15px; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .panel h2 .badge {
+    font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px;
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  .badge-ptx  { background:rgba(239,68,68,0.15); color:#f87171; }
+  .badge-tirx { background:rgba(52,211,153,0.15); color:#34d399; }
+
+  pre.code-block {
+    margin:0; tab-size:4; white-space:pre;
+  }
+
+  /* Hover group highlighting */
+  .code-block [data-group] {
+    transition: opacity .25s ease, background .25s ease;
+    border-radius:3px; padding:1px 0;
+  }
+  .code-block.has-hover [data-group] {
+    opacity:.3;
+  }
+  .code-block.has-hover [data-group].active {
+    opacity:1;
+  }
+
+  /* Group highlight backgrounds (dark theme) */
+  [data-group="desc"].active  { background:rgba(59,130,246,.25); }
+  [data-group="mma"].active   { background:rgba(5,150,105,.25); }
+  [data-group="barrier"].active { background:rgba(217,119,6,.25); }
+  [data-group="commit"].active  { background:rgba(157,110,181,.25); }
+
+  /* Flow bar */
+  .flow-bar {
+    max-width:1200px; margin:20px auto 0; background:var(--surface);
+    border-radius:10px; padding:14px 20px; border:1px solid var(--border);
+    box-shadow:0 1px 3px rgba(0,0,0,.06);
+  }
+  .flow-bar .flow-title {
+    font-size:12px; font-weight:700; color:var(--dim); text-transform:uppercase;
+    letter-spacing:.5px; margin-bottom:10px; text-align:center;
+  }
+  .flow-steps {
+    display:flex; align-items:center; justify-content:center; gap:0;
+  }
+  .flow-step {
+    display:flex; align-items:center; justify-content:center;
+    padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600;
+    font-family:'SF Mono','Fira Code',monospace; white-space:nowrap;
+  }
+  .flow-step.python { background:#d1fae5; color:#065f46; }
+  .flow-step.tir    { background:#dbeafe; color:#1e40af; }
+  .flow-step.ptx    { background:#fef3c7; color:#92400e; }
+  .flow-step.cubin  { background:#f3e8ff; color:#6b21a8; }
+  .flow-arrow {
+    display:flex; align-items:center; padding:0 6px; color:var(--dim); font-size:18px;
+  }
+  .flow-arrow svg { width:32px; height:16px; }
+  .flow-arrow svg line { stroke:#94a3b8; stroke-width:2; }
+  .flow-arrow svg polygon { fill:#94a3b8; }
+
+  /* Legend */
+  .color-legend {
+    max-width:1200px; margin:14px auto 0;
+    display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+  }
+  .color-legend .cl-item {
+    display:flex; align-items:center; gap:6px; font-size:11px; color:var(--dim); font-weight:500;
+  }
+  .color-legend .cl-swatch {
+    width:14px; height:14px; border-radius:3px;
+  }
+
+  /* TIRx info box (dark) */
+  .tirx-info {
+    margin-top:18px; padding:14px 16px;
+    background:rgba(255,255,255,0.04); border-radius:8px;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .tirx-info .tirx-info-title {
+    font-size:12px; font-weight:700; color:#94a3b8; margin-bottom:8px;
+  }
+  .tirx-info .tirx-info-items {
+    font-size:12px; line-height:1.8; color:#cbd5e1;
+  }
+  .tirx-info .tirx-info-item {
+    display:flex; align-items:baseline; gap:6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>TIRx: Operator Dispatch</h1>
+<div class="sub">Same GEMM operation, different abstraction levels</div>
+
+<div class="panels">
+  <!-- Left: PTX -->
+  <div class="panel">
+    <h2>Raw PTX <span class="badge badge-ptx">~20 lines</span></h2>
+    <div class="cb-panel dark">
+      <div class="cb-header">CUDA C / PTX</div>
+<pre class="code-block code-dark" id="ptx-code"><code><span class="cmt">// SmemDescriptor encoding (per operand)</span>
+<span class="kw">uint64_t</span> desc <span class="op">=</span> base_addr;
+desc <span class="op">|=</span> ((<span class="kw">uint64_t</span>)(ldo <span class="op">&gt;&gt;</span> <span class="num">4</span>)) <span class="op">&lt;&lt;</span> <span class="num">16</span>;
+desc <span class="op">|=</span> ((<span class="kw">uint64_t</span>)(sdo <span class="op">&gt;&gt;</span> <span class="num">4</span>)) <span class="op">&lt;&lt;</span> <span class="num">32</span>;
+desc <span class="op">|=</span> ((<span class="kw">uint64_t</span>)swizzle_mode) <span class="op">&lt;&lt;</span> <span class="num">62</span>;
+
+<span class="cmt">// InstrDescriptor encoding</span>
+<span class="kw">uint32_t</span> idesc <span class="op">=</span> <span class="num">0</span>;
+idesc <span class="op">|=</span> (<span class="num">1u</span> <span class="op">&lt;&lt;</span> <span class="num">4</span>);   <span class="cmt">// dtype=FP32</span>
+idesc <span class="op">|=</span> (<span class="num">1u</span> <span class="op">&lt;&lt;</span> <span class="num">7</span>);   <span class="cmt">// atype=FP16</span>
+idesc <span class="op">|=</span> (<span class="num">1u</span> <span class="op">&lt;&lt;</span> <span class="num">10</span>);  <span class="cmt">// btype=FP16</span>
+idesc <span class="op">|=</span> (N <span class="op">&gt;&gt;</span> <span class="num">3</span>) <span class="op">&lt;&lt;</span> <span class="num">17</span>;  <span class="cmt">// MMA_N</span>
+idesc <span class="op">|=</span> (M <span class="op">&gt;&gt;</span> <span class="num">4</span>) <span class="op">&lt;&lt;</span> <span class="num">24</span>;  <span class="cmt">// MMA_M</span>
+
+<span data-group="barrier"><span class="cmt">// mbarrier setup</span>
+<span class="kw">mbarrier.init</span> [mbar], <span class="num">1</span>;
+<span class="kw">fence.mbarrier_init.release.cluster</span>;</span>
+
+<span data-group="mma"><span class="cmt">// Issue MMA (single thread)</span>
+<span class="kw">tcgen05.mma</span><span class="op">.cta_group::</span><span class="num">1</span><span class="op">.kind::</span><span class="num">f16</span>
+    [tmem_addr], a_desc, b_desc, idesc, accum;</span>
+
+<span data-group="commit"><span class="kw">tcgen05.commit</span><span class="op">.cta_group::</span><span class="num">1</span>
+    <span class="op">.mbarrier::arrive::one</span> [mbar];</span>
+
+<span data-group="barrier"><span class="cmt">// Wait for completion</span>
+<span class="kw">mbarrier.try_wait.parity</span> [mbar], phase;</span></code></pre>
+    </div>
+  </div>
+
+  <!-- Right: TIRx -->
+  <div class="panel">
+    <h2>TIRx <span class="badge badge-tirx">3 lines</span></h2>
+    <div class="cb-panel dark">
+      <div class="cb-header">TIRx DSL</div>
+<pre class="code-block code-dark" id="tirx-code"><code><span data-group="mma">Tx.<span class="fn">gemm_async</span>(tmem[:,:BLK_N], Asmem, Bsmem,
+              <span class="kw">accum</span><span class="op">=</span>k<span class="op">!=</span><span class="num">0</span>, <span class="kw">dispatch</span><span class="op">=</span><span class="str">"tcgen05"</span>)</span>
+<span data-group="commit">T.ptx.tcgen05.<span class="fn">commit</span>(mma_bar, <span class="kw">cta_group</span><span class="op">=</span><span class="num">1</span>)</span>
+<span data-group="barrier">T.ptx.mbarrier.<span class="fn">try_wait</span>(mma_bar, phase)</span></code></pre>
+    </div>
+
+    <div class="tirx-info">
+      <div class="tirx-info-title">What TIRx handles for you:</div>
+      <div class="tirx-info-items">
+        <div class="tirx-info-item">
+          <span style="color:#059669; font-weight:700;">&#x2713;</span>
+          <span>Correct MMA instruction selection &amp; modifiers</span>
+        </div>
+        <div class="tirx-info-item">
+          <span style="color:#d97706; font-weight:700;">&#x2713;</span>
+          <span>Barrier init, fence, and synchronization</span>
+        </div>
+        <div class="tirx-info-item">
+          <span style="color:#9d6eb5; font-weight:700;">&#x2713;</span>
+          <span>Commit &amp; completion signaling</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="color-legend">
+  <div class="cl-item"><div class="cl-swatch" style="background:#059669;"></div> MMA operation</div>
+  <div class="cl-item"><div class="cl-swatch" style="background:#d97706;"></div> Barrier / sync</div>
+  <div class="cl-item"><div class="cl-swatch" style="background:#9d6eb5;"></div> Commit</div>
+</div>
+
+<div class="flow-bar">
+  <div class="flow-title">Compilation Flow</div>
+  <div class="flow-steps">
+    <div class="flow-step python">TIRx Python</div>
+    <div class="flow-arrow"><svg viewBox="0 0 32 16"><line x1="0" y1="8" x2="22" y2="8"/><polygon points="22,3 32,8 22,13"/></svg></div>
+    <div class="flow-step tir">TIR</div>
+    <div class="flow-arrow"><svg viewBox="0 0 32 16"><line x1="0" y1="8" x2="22" y2="8"/><polygon points="22,3 32,8 22,13"/></svg></div>
+    <div class="flow-step ptx">PTX</div>
+    <div class="flow-arrow"><svg viewBox="0 0 32 16"><line x1="0" y1="8" x2="22" y2="8"/><polygon points="22,3 32,8 22,13"/></svg></div>
+    <div class="flow-step cubin">cubin</div>
+  </div>
+  <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--dim); font-family:'SF Mono','Fira Code',monospace;">
+    TIRx: Python DSL on TVM &rarr; compiles to PTX &rarr; cubin
+  </div>
+</div>
+
+<script>
+(function() {
+  var ptxBlock = document.getElementById('ptx-code');
+  var tirxBlock = document.getElementById('tirx-code');
+  var allBlocks = [ptxBlock, tirxBlock];
+
+  function getAllGroupSpans() {
+    var spans = [];
+    allBlocks.forEach(function(block) {
+      var els = block.querySelectorAll('[data-group]');
+      for (var i = 0; i < els.length; i++) spans.push(els[i]);
+    });
+    return spans;
+  }
+
+  function activateGroup(groupName) {
+    allBlocks.forEach(function(b) { b.classList.add('has-hover'); });
+    var spans = getAllGroupSpans();
+    for (var i = 0; i < spans.length; i++) {
+      if (spans[i].dataset.group === groupName) {
+        spans[i].classList.add('active');
+      }
+    }
+  }
+
+  function deactivateAll() {
+    allBlocks.forEach(function(b) { b.classList.remove('has-hover'); });
+    var spans = getAllGroupSpans();
+    for (var i = 0; i < spans.length; i++) {
+      spans[i].classList.remove('active');
+    }
+  }
+
+  allBlocks.forEach(function(block) {
+    var groupSpans = block.querySelectorAll('[data-group]');
+    for (var j = 0; j < groupSpans.length; j++) {
+      (function(span) {
+        span.style.cursor = 'pointer';
+        span.addEventListener('mouseenter', function() {
+          activateGroup(span.dataset.group);
+        });
+        span.addEventListener('mouseleave', function() {
+          deactivateAll();
+        });
+      })(groupSpans[j]);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
