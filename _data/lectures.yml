@@ -174,7 +174,7 @@
   lecturer: Zhihao Jia
   title: >
     Week 10: <strong>LLMs: Training (PEFT)</strong>
-  slides:
+  slides: /slides/16-LLM-finetuning.pdf
   notes:
   readings:
   logistics:
