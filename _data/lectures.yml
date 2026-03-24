@@ -207,7 +207,7 @@
   slides:
   notes:
   readings:
-  logistics: Lab 3 Due
+  logistics:
 
 - date: 04/01 Wed
   lecturer: Zhihao Jia
@@ -233,7 +233,7 @@
   title: >
     Week 13: <strong>Advanced topics: Automated ML Parallelization</strong>
   slides:
-  logistics:
+  logistics: Lab 3 Due
 
 - date: 04/13 Mon
   lecturer: Tianqi Chen
