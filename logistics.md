@@ -40,9 +40,9 @@ Grades will be based on the following parts:
   * Poster presentation: 20%
   * Project report: 20%
 
-You will submit all your work to Gradescope.
+You will submit all your work to Autolab.
 
-<!-- For the course project or presentation, you may work in groups of up to two or three students total. Only one person should submit the writeup and code on Gradescope. Make sure you **mark your partner as a collaborator on Gradescope** and that both names are listed in the writeup.
+<!-- For the course project or presentation, you may work in groups of up to two or three students total. Only one person should submit the writeup and code on Autolab. Make sure you **mark your partner as a collaborator on Autolab** and that both names are listed in the writeup.
 
 **Course project submission**: Students are required to **typeset written final course project reports using provided Latex template**. All code, including auxiliary scripts used for testing should be submitted with a README file to explain/document them.
 
@@ -71,7 +71,7 @@ For one-page proposal, The team is expected to write the following components:
 - Status quo: You should research work related to your own. What problem did they solve and how does it relate to yours? How can you improve on what has already been done?
 - High-level implementation plans: What datasets do you plan to use? How do you plan to implement and evaluate your ideas?
 
-You can submit one-page proposal in any format (PDF) to the Gradescope. Note that we understand that any component of the initial proposal can change dramatically over the course of your project. This proposal is to make sure everyone has a concrete idea of what to work on.
+You can submit one-page proposal in any format (PDF) to the Autolab. Note that we understand that any component of the initial proposal can change dramatically over the course of your project. This proposal is to make sure everyone has a concrete idea of what to work on.
 
 
 ### Intermediate check-in (During TAs' Office Hours)
@@ -81,7 +81,7 @@ As an intermediate check-in of course project, we require you to come to the OH 
 
 ### Final course project presentation (Deadline: April 30 (Thursday), 1:00-4:00pm EST)
 
-We require every team to present the final course project. Please submit your poster to Gradescope until the deadline. Your presentation should include the following aspects: introduction and overview of your project, problem statement, related work. method, and evaluation.
+We require every team to present the final course project. Please submit your poster to Autolab until the deadline. Your presentation should include the following aspects: introduction and overview of your project, problem statement, related work. method, and evaluation.
 
 ### Final course project report (Deadline: May 3 (Sunday), 11:59 PM EST)
 
@@ -96,7 +96,7 @@ For your final project report, the team is expected to write a final report (up 
 - Evaluation: How did you evaluate your system? What are experimental settings (e.g., hardware)? If any, what datasets did you use? What are evaluation metrics and hyperparameters?
 - Conclusion: Summarize your work in a single paragraph
 
-You are required to submit your codes and final report in the [MLSys 2025 format](https://media.mlsys.org/Conferences/MLSYS2025/mlsys2025style.zip) (PDF) to the Gradescope. Again, please make sure you mark your partner as a collaborator on Gradescope and that all names are listed in the final report.
+You are required to submit your codes and final report in the [MLSys 2025 format](https://media.mlsys.org/Conferences/MLSYS2025/mlsys2025style.zip) (PDF) to the Autolab. Again, please make sure you mark your partner as a collaborator on Autolab and that all names are listed in the final report.
 
 ***
 
@@ -128,7 +128,7 @@ Grace days will be **subtracted from all students in the team**. E.g. an assignm
 TBD.
 -->
 
-<!-- If you feel that we have made a mistake in grading your report, please request a regrade on Gradescope and we will consider your request.
+<!-- If you feel that we have made a mistake in grading your report, please request a regrade on Autolab and we will consider your request.
 
 Please note that regrading may cause your grade to go either up or down. -->
 
