@@ -194,7 +194,7 @@
   lecturer: Tianqi Chen
   title: >
     Week 11: <strong>LLMs: Mixture of Experts</strong>
-  slides:
+  slides: /slides/16-mixture-of-experts.pdf
   notes:
   readings:
   logistics:
