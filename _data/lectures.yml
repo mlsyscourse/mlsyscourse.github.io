@@ -201,10 +201,10 @@
 
 
 - date: 03/30 Mon
-  lecturer: Zhihao Jia
+  lecturer: Tianqi Chen
   title: >
-    Week 12: <strong>Advanced topics: Graph-level Optimization</strong>
-  slides:
+    Week 12: <strong>Advanced topics: ML Compilation</strong>
+  slides: /slides/advanced-topic-mlc.pdf
   notes:
   readings:
   logistics:
