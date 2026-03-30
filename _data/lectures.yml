@@ -210,9 +210,9 @@
   logistics:
 
 - date: 04/01 Wed
-  lecturer: Zhihao Jia
+  lecturer:
   title: >
-    Week 12: <strong>Advanced topics: ML super optimization</strong>
+    Week 12: <strong>No Class.</strong>
   slides:
   notes:
   readings:
@@ -231,30 +231,24 @@
 - date: 04/08 Wed
   lecturer: Zhihao Jia
   title: >
-    Week 13: <strong>Advanced topics: Automated ML Parallelization</strong>
+    Week 13: <strong> Guest Lecture: LLM Agents</strong>
   slides:
   logistics: Lab 3 Due
 
 - date: 04/13 Mon
-  lecturer: Tianqi Chen
+  lecturer:
   title: >
-    Week 14: <strong>Advanced topics: TBD</strong>
+    Week 14: <strong>Guest Lecture: Google TPU</strong>
   slides:
   notes:
 
 - date: 04/15 Wed
-  lecturer:
+  lecturer: Zhihao Jia
   title: >
-    Week 14: <strong>Guest Lecture: TBD</strong>
+    Week 14: <strong>Advanced topics: ML super optimization</strong>
   slides:
   logistics:
   readings:
-
-- date: 04/20 Mon
-  lecturer:
-  title: >
-    Week 15: <strong></strong>
-  logistics:
 
 - date: 04/30 Friday
   lecturer:
