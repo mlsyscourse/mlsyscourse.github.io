@@ -222,16 +222,16 @@
 - date: 04/06 Mon
   lecturer: Zhihao Jia
   title: >
-    Week 13: <strong>Advanced topics: MegaKernels</strong>
+    Week 13: <strong>Advanced topics: ML Superoptimization</strong>
   notes:
-  slides:
+  slides: /slides/18-kernel-superoptimization.pdf
   readings:
   logistics:
 
 - date: 04/08 Wed
   lecturer: Zhihao Jia
   title: >
-    Week 13: <strong> Guest Lecture: LLM Agents</strong>
+    Week 13: <strong> Advanced topics: ML super optimization</strong>
   slides:
   logistics: Lab 3 Due
 
@@ -243,9 +243,9 @@
   notes:
 
 - date: 04/15 Wed
-  lecturer: Zhihao Jia
+  lecturer:
   title: >
-    Week 14: <strong>Advanced topics: ML super optimization</strong>
+    Week 14: <strong>Guest Lecture: LLM Agents</strong>
   slides:
   logistics:
   readings:
