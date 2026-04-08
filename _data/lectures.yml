@@ -231,8 +231,8 @@
 - date: 04/08 Wed
   lecturer: Zhihao Jia
   title: >
-    Week 13: <strong> Advanced topics: ML super optimization</strong>
-  slides:
+    Week 13: <strong> Advanced topics: Mega-Kernel</strong>
+  slides: /slides/19-mega-kernel.pdf
   logistics: Lab 3 Due
 
 - date: 04/13 Mon
